@@ -396,6 +396,9 @@
 		95ED5F1D1B084D3900CDB225 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 95ED5F1A1B084D3900CDB225 /* SVProgressHUD.m */; };
 		95ED5F3C1B084DD600CDB225 /* RMDateSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 95ED5F3B1B084DD600CDB225 /* RMDateSelectionViewController.m */; };
 		95ED5F401B084F7500CDB225 /* RMActionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 95ED5F3F1B084F7500CDB225 /* RMActionController.m */; };
+		95F2F6561B47C07E0012DBFD /* MSRTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F2F6551B47C07E0012DBFD /* MSRTableView.swift */; };
+		95F2F6591B47C44F0012DBFD /* FFPublishmentStepCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 95F2F6581B47C44F0012DBFD /* FFPublishmentStepCell.xib */; };
+		95F2F65B1B47C45E0012DBFD /* FFPublishmentStepCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F2F65A1B47C45E0012DBFD /* FFPublishmentStepCell.swift */; };
 		95F380BB1AB269690070A7FB /* FeaturedObjectListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F380BA1AB269690070A7FB /* FeaturedObjectListViewController.swift */; };
 		95F380C71AB33CC50070A7FB /* MSRMultilineLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F380C61AB33CC50070A7FB /* MSRMultilineLabel.swift */; };
 /* End PBXBuildFile section */
@@ -1014,6 +1017,9 @@
 		95ED5F3B1B084DD600CDB225 /* RMDateSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMDateSelectionViewController.m; sourceTree = "<group>"; };
 		95ED5F3E1B084F7500CDB225 /* RMActionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMActionController.h; sourceTree = "<group>"; };
 		95ED5F3F1B084F7500CDB225 /* RMActionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMActionController.m; sourceTree = "<group>"; };
+		95F2F6551B47C07E0012DBFD /* MSRTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSRTableView.swift; sourceTree = "<group>"; };
+		95F2F6581B47C44F0012DBFD /* FFPublishmentStepCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FFPublishmentStepCell.xib; sourceTree = "<group>"; };
+		95F2F65A1B47C45E0012DBFD /* FFPublishmentStepCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FFPublishmentStepCell.swift; sourceTree = "<group>"; };
 		95F380BA1AB269690070A7FB /* FeaturedObjectListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeaturedObjectListViewController.swift; sourceTree = "<group>"; };
 		95F380C61AB33CC50070A7FB /* MSRMultilineLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSRMultilineLabel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1142,6 +1148,7 @@
 				9531D6DD1AF3E4AC00E6549D /* Explore */,
 				9531D6E51AF3E4AC00E6549D /* Home */,
 				9531D7631AF3E85900E6549D /* Others */,
+				95F2F6571B47C3670012DBFD /* Publishment */,
 				9531D6F71AF3E4AC00E6549D /* Question */,
 				95EBCF3F1B2DB24F0088FC2C /* Search */,
 				9531D7041AF3E4AC00E6549D /* Sidebar */,
@@ -1977,6 +1984,7 @@
 				95C2EA101AB0516800F2A326 /* MSRSegmentedControlRainbowBlockIndicator.swift */,
 				95C2EA111AB0516800F2A326 /* MSRSegmentedControlUnderlineIndicator.swift */,
 				95C2EA121AB0516800F2A326 /* MSRSegmentedViewController.swift */,
+				95F2F6551B47C07E0012DBFD /* MSRTableView.swift */,
 				9583E3341AB6812400067F37 /* MSRLayoutGuide.swift */,
 				95C893761AC7365D00B7B385 /* MSRSidebar.swift */,
 				95C47D4A1AC9C2BE00A56879 /* UIButton+MSRSetter.swift */,
@@ -2219,6 +2227,15 @@
 			path = RMActionController/RMActionController;
 			sourceTree = "<group>";
 		};
+		95F2F6571B47C3670012DBFD /* Publishment */ = {
+			isa = PBXGroup;
+			children = (
+				95F2F65A1B47C45E0012DBFD /* FFPublishmentStepCell.swift */,
+				95F2F6581B47C44F0012DBFD /* FFPublishmentStepCell.xib */,
+			);
+			path = Publishment;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2318,6 +2335,7 @@
 				958600891B187CC50054DAA8 /* SidebarUserView.xib in Resources */,
 				95EAF77C1B3D319700863F19 /* MJRefresh.bundle in Resources */,
 				9531D7541AF3E4AC00E6549D /* UserBodyCell.xib in Resources */,
+				95F2F6591B47C44F0012DBFD /* FFPublishmentStepCell.xib in Resources */,
 				950FE1271A1DA2A400167D09 /* Welcome.strings in Resources */,
 				9531D7391AF3E4AC00E6549D /* QuestionFocusingActionCell.xib in Resources */,
 				951D1E741ACD1E4E0072D555 /* default.css in Resources */,
@@ -2442,6 +2460,7 @@
 				951D1EAE1ACD1E4E0072D555 /* NSString+HTML.m in Sources */,
 				95EBCF431B2DB2A20088FC2C /* TopicSearchResultCell.swift in Sources */,
 				9531D7971AF3E8E400E6549D /* Topic.swift in Sources */,
+				95F2F6561B47C07E0012DBFD /* MSRTableView.swift in Sources */,
 				9531D6A21AF0A27100E6549D /* AnswerListViewController.swift in Sources */,
 				9531D79B1AF3E8E400E6549D /* String+PlainString.swift in Sources */,
 				95EAF7771B3D319700863F19 /* MJRefreshBackNormalFooter.m in Sources */,
@@ -2519,6 +2538,7 @@
 				951D1F801ACD1E750072D555 /* DTSidePanelControllerSegue.m in Sources */,
 				951D1EAD1ACD1E4E0072D555 /* NSString+CSS.m in Sources */,
 				951D1E881ACD1E4E0072D555 /* DTCoreTextLayoutLine.m in Sources */,
+				95F2F65B1B47C45E0012DBFD /* FFPublishmentStepCell.swift in Sources */,
 				95C2EA3F1AB0516800F2A326 /* UIColor+MSRRandomColor.swift in Sources */,
 				951D1F6A1ACD1E750072D555 /* NSString+DTUTI.m in Sources */,
 				958FF4D71AC270820073022F /* String+MSROperations.swift in Sources */,

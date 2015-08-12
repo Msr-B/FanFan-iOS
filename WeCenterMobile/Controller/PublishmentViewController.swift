@@ -39,14 +39,34 @@ extension Article: PublishmentViewControllerPresentable {}
     optional func publishmentViewControllerDidSuccessfullyPublishDataObject(publishmentViewController: PublishmentViewController)
 }
 
-class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTokenFieldDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate, UITextViewDelegate {
+class FFStepObject: Equatable {
+    var image: UIImage? = nil
+    var attachID: Int? = nil
+    var text: String = ""
+    var operation: AFHTTPRequestOperation? = nil
+    var uploadingProgresses: Int = 0
+    var uploaded: Bool = false {
+        didSet {
+            if uploaded {
+                uploadingProgresses = FFStepObject.maxProgress
+            }
+        }
+    }
+    static let maxProgress = 1000
+}
+
+func ==(lhs: FFStepObject, rhs: FFStepObject) -> Bool {
+    return lhs === rhs
+}
+
+class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTokenFieldDelegate, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate, UITextViewDelegate {
     
     @IBOutlet weak var headerLabel: UILabel!
     @IBOutlet weak var publishButton: UIButton!
     @IBOutlet weak var dismissButton: UIButton!
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var tagsField: ZFTokenField?
-    @IBOutlet weak var imageCollectionView: UICollectionView!
+    @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var titleField: UITextView?
     @IBOutlet weak var bodyField: UITextView!
     @IBOutlet weak var titleLabel: UILabel?
@@ -55,6 +75,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     @IBOutlet weak var imagesLabel: UILabel!
     @IBOutlet weak var separator: UIView!
     @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var reorderButton: UIButton!
+    @IBOutlet weak var addButton: UIButton!
     
     typealias SelfType = PublishmentViewController
     
@@ -68,35 +90,25 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         }
     }
     
-    static let identifiers = ["ImageCell", "ButtonCell"]
+    static let cellReuseIdentifier = "FFPublishmentStepCell"
     static let imageViewTag = 23333
     static let progressViewTag = 23334
     static let buttonTag = 23335
     static let overlayViewTag = 23336
-    static let notAnAttachID = -1
     static let maxImageSideLength: CGFloat = 1920
     static let imageCompressionQuality: CGFloat = 0.7
     
     var converting = false
     var tags = [String]()
-    var images = [UIImage]()
-    var attachIDs = [Int]()
-    var operations = [AFHTTPRequestOperation]()
-    var uploadingProgresses = [Int]()
-    var uploaded = [Bool]() {
-        didSet {
-            if uploaded.reduce(true, combine: { $0 && $1 }) {
-                allUploaded.signal()
-            }
-        }
-    }
-    var allUploaded = NSCondition()
-    let maxProgress = 100
+    
+    var steps = [FFStepObject()] // initialized with 1 step
+    var currentStep: FFStepObject? = nil
     
     override func awakeFromNib() {
         super.awakeFromNib()
         let theme = SettingsManager.defaultManager.currentTheme
         view.backgroundColor = theme.backgroundColorA
+        view.clipsToBounds = true
         for v in [UIView?](arrayLiteral: titleField, tagsField, bodyField) {
             v?.msr_borderColor = theme.borderColorA
             v?.backgroundColor = theme.backgroundColorB
@@ -112,9 +124,13 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         separator.backgroundColor = theme.borderColorA
         publishButton.addTarget(self, action: "publish", forControlEvents: .TouchUpInside)
         dismissButton.addTarget(self, action: "dismiss", forControlEvents: .TouchUpInside)
+        reorderButton.backgroundColor = theme.backgroundColorB
+        reorderButton.setTitleColor(theme.subtitleTextColor, forState: .Normal)
+        addButton.backgroundColor = theme.backgroundColorB
+        addButton.setTitleColor(theme.subtitleTextColor, forState: .Normal)
         publishButton.backgroundColor = theme.backgroundColorB
         publishButton.setTitleColor(theme.subtitleTextColor, forState: .Normal)
-        for v in [publishButton, dismissButton] {
+        for v in [reorderButton, addButton, publishButton, dismissButton] {
             v.msr_setBackgroundImageWithColor(theme.highlightColor, forState: .Highlighted)
             v.msr_borderColor = theme.borderColorA
         }
@@ -132,16 +148,18 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         scrollView.msr_setTouchesShouldCancel(true, inContentViewWhichIsKindOfClass: UIButton.self)
         let tap = UITapGestureRecognizer(target: self, action: "didTouchBlankArea")
         scrollView.addGestureRecognizer(tap)
-        for identifier in SelfType.identifiers {
-            imageCollectionView.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: identifier)
-        }
+        tableView.estimatedRowHeight = 200
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.registerNib(UINib(nibName: "FFPublishmentStepCell", bundle: NSBundle.mainBundle()), forCellReuseIdentifier: SelfType.cellReuseIdentifier)
+        tableView.delaysContentTouches = false
+        tableView.msr_wrapperView?.delaysContentTouches = false
+        tableView.msr_setTouchesShouldCancel(true, inContentViewWhichIsKindOfClass: UIButton.self)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillChangeFrame:", name: UIKeyboardWillChangeFrameNotification, object: nil)
         tagsField?.reloadData()
-        imageCollectionView.reloadData()
     }
     
     // MARK: - ZFTokenFieldDataSource
@@ -206,103 +224,109 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         tagsField?.textField.attributedPlaceholder = NSAttributedString(string: tags.count > 0 ? "..." : "输入并以换行键添加，可添加多个", attributes: [NSForegroundColorAttributeName: theme.footnoteTextColor])
     }
     
-    // MARK: - UICollectionDataSource
+    // MARK: - UITableViewDataSource
     
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return images.count + 1
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return steps.count
     }
     
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let theme = SettingsManager.defaultManager.currentTheme
-        let cell: UICollectionViewCell!
-        if indexPath.item < images.count {
-            let image = images[indexPath.item]
-            let maxProgress = self.maxProgress
-            let uploadingProgress = Int(uploadingProgresses[indexPath.item])
-            cell = imageCollectionView.dequeueReusableCellWithReuseIdentifier(SelfType.identifiers[0], forIndexPath: indexPath) as! UICollectionViewCell
-            var imageView: UIImageView! = cell.contentView.viewWithTag(SelfType.imageViewTag) as? UIImageView
-            if imageView == nil {
-                imageView = UIImageView()
-                imageView.tag = SelfType.imageViewTag
-                cell.contentView.addSubview(imageView)
-                imageView.contentMode = .ScaleAspectFill
-                imageView.clipsToBounds = true
-                imageView.msr_shouldTranslateAutoresizingMaskIntoConstraints = false
-                imageView.msr_addAllEdgeAttachedConstraintsToSuperview()
-            }
-            imageView!.image = images[indexPath.item]
-            var overlayView: UIView! = cell.contentView.viewWithTag(SelfType.overlayViewTag)
-            if overlayView == nil {
-                overlayView = UIView()
-                overlayView.tag = SelfType.overlayViewTag
-                cell.contentView.insertSubview(overlayView, aboveSubview: imageView)
-                overlayView.msr_shouldTranslateAutoresizingMaskIntoConstraints = false
-                overlayView.msr_addAllEdgeAttachedConstraintsToSuperview()
-                overlayView.backgroundColor = scrollView.backgroundColor!.colorWithAlphaComponent(0.7)
-            }
-            var progressView: EAColourfulProgressView! = cell.contentView.viewWithTag(SelfType.progressViewTag) as? EAColourfulProgressView
-            if progressView == nil {
-                progressView = NSBundle.mainBundle().loadNibNamed("ImageUploadingProgressBar", owner: self, options: nil).first as! EAColourfulProgressView
-                progressView.tag = SelfType.progressViewTag
-                progressView.msr_shouldTranslateAutoresizingMaskIntoConstraints = false
-                progressView.msr_addHeightConstraintWithValue(8)
-                cell.contentView.insertSubview(progressView, aboveSubview: overlayView)
-                progressView.msr_addHorizontalEdgeAttachedConstraintsToSuperview()
-                progressView.msr_addBottomAttachedConstraintToSuperview()
-                progressView.maximumValue = UInt(maxProgress)
-            }
-            overlayView.alpha = uploadingProgress == maxProgress ? 0 : 1
-            progressView.alpha = uploadingProgress == maxProgress ? 0 : 1
-            progressView.updateToCurrentValue(maxProgress - uploadingProgress, animated: false)
-        } else {
-            cell = imageCollectionView.dequeueReusableCellWithReuseIdentifier(SelfType.identifiers[1], forIndexPath: indexPath) as! UICollectionViewCell
-            var button: UIButton! = cell.contentView.viewWithTag(SelfType.buttonTag) as? UIButton
-            if button == nil {
-                button = UIButton()
-                button.msr_borderColor = theme.borderColorA
-                button.msr_borderWidth = 0.5
-                button.tag = SelfType.buttonTag
-                cell.contentView.addSubview(button)
-                button.msr_shouldTranslateAutoresizingMaskIntoConstraints = false
-                button.msr_addAllEdgeAttachedConstraintsToSuperview()
-                button.setImage(UIImage(named: "Publishment-Attachment"), forState: .Normal)
-                button.imageView!.tintColor = theme.backgroundColorB
-                button.adjustsImageWhenHighlighted = false
-                button.msr_setBackgroundImageWithColor(theme.highlightColor, forState: .Highlighted)
-                button.addTarget(self, action: "showImagePickerController", forControlEvents: .TouchUpInside)
-            }
-        }
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let step = steps[indexPath.row]
+        let cell = tableView.dequeueReusableCellWithIdentifier(SelfType.cellReuseIdentifier, forIndexPath: indexPath) as! FFPublishmentStepCell
+        cell.stepIndexLabel.text = "\(indexPath.row + 1)"
+        cell.textView.delegate = self
+        cell.titleImageButton.addTarget(self, action: "didPressUploadButton:", forControlEvents: .TouchUpInside)
+        cell.update(step: step)
         return cell
     }
     
-    func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return indexPath.item < images.count
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
     }
     
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let image = images[indexPath.item]
-        let ac = UIAlertController(title: "再次确认", message: "您确定要删除这张图片吗？", preferredStyle: .ActionSheet)
-        ac.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
-        ac.addAction(UIAlertAction(title: "删除图片", style: .Destructive)
-            /* handler: */ {
-                [weak self] action in
-                if let self_ = self {
-                    if let index = find(self_.images, image) {
-                        self_.removeDataAtIndex(index)
-                        self_.imageCollectionView.deleteItemsAtIndexPaths([NSIndexPath(forItem: index, inSection: 0)])
+    func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+        return tableView.editing ? .None : .Delete
+    }
+    
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        // Required to show the edit buttons. Don't remove and keep empty please.
+    }
+    
+    func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
+        var a = sourceIndexPath.row
+        var b = destinationIndexPath.row
+        let cells: (Int) -> FFPublishmentStepCell? = {
+            tableView.cellForRowAtIndexPath(NSIndexPath(forRow: $0, inSection: 0)) as? FFPublishmentStepCell
+        }
+        cells(a)?.stepIndexLabel.text = "\(b + 1)"
+        if a < b {
+            for i in a + 1...b {
+                cells(i)?.stepIndexLabel.text = "\(i)"
+            }
+        } else if a > b {
+            for i in b...a - 1 {
+                cells(i)?.stepIndexLabel.text = "\(i + 2)"
+            }
+        }
+        let step = steps[a]
+        steps.removeAtIndex(a)
+        steps.insert(step, atIndex: b)
+    }
+    
+    func tableView(tableView: UITableView, didEndEditingRowAtIndexPath indexPath: NSIndexPath) {
+        
+    }
+    
+    // MARK: - UITableViewDelegate
+    
+    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
+        let deleteAction = UITableViewRowAction(style: .Default, title: "删除") {
+            [weak self] action, indexPath in
+            if let self_ = self {
+                let cells: (Int) -> FFPublishmentStepCell? = {
+                    self_.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: $0, inSection: 0)) as? FFPublishmentStepCell
+                }
+                let rows = self_.tableView.numberOfRowsInSection(0)
+                self_.tableView.beginUpdates()
+                self_.steps[indexPath.row].operation?.cancel()
+                self_.steps.removeAtIndex(indexPath.row)
+                if indexPath.row < rows - 1 {
+                    for i in indexPath.row + 1..<rows {
+                        cells(i)?.stepIndexLabel.text = "\(i)"
                     }
                 }
-                return
-            })
-        presentViewController(ac, animated: true, completion: nil)
+                self_.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                self_.tableView.endUpdates()
+            }
+            return
+        }
+        return [deleteAction]
     }
     
-    func collectionView(collectionView: UICollectionView, shouldHighlightItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
+    func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return false
+    }
+    
+    func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return false
+    }
+    
+    // MARK: - UITextViewDelegate
+    
+    func textViewDidChange(textView: UITextView) {
+        if let indexPath = tableView.indexPathForRowAtPoint(textView.convertPoint(CGPointZero, toView: tableView)) {
+            steps[indexPath.row].text = textView.text
+        }
+        tableView.beginUpdates()
+        tableView.endUpdates()
     }
     
     // MARK: - UIImagePickerControllerDelegate
@@ -311,86 +335,101 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         SVProgressHUD.showWithMaskType(.Gradient)
         picker.dismissViewControllerAnimated(true, completion: nil)
         converting = true
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            [weak self] in
-            if let self_ = self {
-                var images = map([info[UIImagePickerControllerOriginalImage] as! UIImage]) {
-                    (image: UIImage) -> UIImage in
-                    let scale = min(1, min(SelfType.maxImageSideLength / image.size.width, SelfType.maxImageSideLength / image.size.height))
-                    let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
-                    return image.msr_imageOfSize(size)
-                }
-                var uploadingProgress = [0]
-                var uploaded = [false]
-                var attachIDs = [SelfType.notAnAttachID]
-                let jpegs = map(images) {
-                    return UIImageJPEGRepresentation($0, SelfType.imageCompressionQuality)
-                }
-                dispatch_async(dispatch_get_main_queue()) {
-                    [weak self] in
-                    self_.images.extend(images)
-                    self_.uploadingProgresses.extend(uploadingProgress)
-                    self_.allUploaded.lock()
-                    self_.uploaded.extend(uploaded)
-                    self_.allUploaded.unlock()
-                    self_.attachIDs.extend(attachIDs)
-                    for i in 0..<images.count {
-                        let image = images[i]
-                        let jpeg = jpegs[i]
-                        let operation = self_.dataObject.uploadImageWithJPEGData(jpeg,
-                            success: {
-                                attachID in
-                                if let index = find(self_.images, image) {
-                                    self_.attachIDs[index] = attachID
-                                    self_.allUploaded.lock()
-                                    self_.uploaded[index] = true
-                                    self_.allUploaded.unlock()
-                                    self_.uploadingProgresses[index] = self_.maxProgress
-                                    self_.imageCollectionView.reloadItemsAtIndexPaths([NSIndexPath(forItem: index, inSection: 0)])
-                                }
-                                return
-                            },
-                            failure: {
-                                error in
-                                var message = error.userInfo?[NSLocalizedDescriptionKey] as? String
-                                if message == nil && error.code != NSURLErrorCancelled {
-                                    message = "未知错误。"
-                                }
-                                if message != nil {
-                                    let ac = UIAlertController(title: "上传失败", message: message!, preferredStyle: .Alert) // Needs localization
-                                    ac.addAction(UIAlertAction(title: "好", style: .Default, handler: nil))
-                                    self_.presentViewController(ac, animated: true, completion: nil)
-                                }
-                                if let index = find(self_.images, image) {
-                                    self_.removeDataAtIndex(index)
-                                    self_.imageCollectionView.deleteItemsAtIndexPaths([NSIndexPath(forItem: index, inSection: 0)])
-                                }
-                                return
-                            })
-                        operation.setUploadProgressBlock() {
-                            bytesWritten, totalBytesWritten, totalBytesExpectedToWrite in
-                            if let index = find(self_.images, image) {
-                                if totalBytesWritten == totalBytesExpectedToWrite {
-                                    self_.allUploaded.lock()
-                                    self_.uploaded[index] = true
-                                    self_.allUploaded.unlock()
-                                }
-                                self_.uploadingProgresses[index] = Int(totalBytesWritten * Int64(self_.maxProgress) / totalBytesExpectedToWrite)
-                                self_.imageCollectionView.reloadItemsAtIndexPaths([NSIndexPath(forItem: index, inSection: 0)])
-                            }
-                            return
-                        }
-                        self_.operations.append(operation)
+        if let step = currentStep {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                [weak self] in
+                if let self_ = self {
+                    var images = map([info[UIImagePickerControllerOriginalImage] as! UIImage]) {
+                        (image: UIImage) -> UIImage in
+                        let scale = min(1, min(SelfType.maxImageSideLength / image.size.width, SelfType.maxImageSideLength / image.size.height))
+                        let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+                        return image.msr_imageOfSize(size)
                     }
-                    self_.imageCollectionView.reloadData()
-                    self_.converting = false
-                    SVProgressHUD.dismiss()
+                    var uploadingProgress = [0]
+                    var uploaded = [false]
+                    var attachIDs: [Int?] = [nil]
+                    let jpegs = map(images) {
+                        return UIImageJPEGRepresentation($0, SelfType.imageCompressionQuality)
+                    }
+                    dispatch_async(dispatch_get_main_queue()) {
+                        [weak self] in
+                        step.image = images.first!
+                        step.uploadingProgresses = uploadingProgress.first!
+                        step.attachID = attachIDs.first!
+                        if let index = find(self_.steps, step) {
+                            self_.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+                        }
+                        for i in 0..<images.count {
+                            let image = images[i]
+                            let jpeg = jpegs[i]
+                            let operation = self_.dataObject.uploadImageWithJPEGData(jpeg,
+                                success: {
+                                    attachID in
+                                    step.attachID = attachID
+                                    return
+                                },
+                                failure: {
+                                    error in
+                                    var message = error.userInfo?[NSLocalizedDescriptionKey] as? String
+                                    if message == nil && error.code != NSURLErrorCancelled {
+                                        message = "未知错误。"
+                                    }
+                                    if message != nil {
+                                        let ac = UIAlertController(title: "上传失败", message: message!, preferredStyle: .Alert) // Needs localization
+                                        ac.addAction(UIAlertAction(title: "好", style: .Default, handler: nil))
+                                        self_.presentViewController(ac, animated: true, completion: nil)
+                                    }
+                                    step.image = nil
+                                    if let index = find(self_.steps, step) {
+                                        self_.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+                                    }
+                                    return
+                            })
+                            operation.setUploadProgressBlock() {
+                                bytesWritten, totalBytesWritten, totalBytesExpectedToWrite in
+                                step.uploadingProgresses = Int(totalBytesWritten * Int64(FFStepObject.maxProgress) / totalBytesExpectedToWrite)
+                                let cells: (Int) -> FFPublishmentStepCell? = {
+                                    self_.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: $0, inSection: 0)) as? FFPublishmentStepCell
+                                }
+                                if let index = find(self_.steps, step) {
+                                    cells(index)?.updateProgress(step: step)
+                                }
+                                return
+                            }
+                            step.operation = operation
+                        }
+                        //                    self_.imageCollectionView.reloadData()
+                        self_.converting = false
+                        SVProgressHUD.dismiss()
+                    }
                 }
             }
         }
     }
     
-    @IBAction func showImagePickerController() {
+    @IBAction func didPressUploadButton(sender: UIButton) {
+        if let indexPath = tableView.indexPathForRowAtPoint(sender.convertPoint(CGPointZero, toView: tableView)) {
+            currentStep = steps[indexPath.row]
+            currentStep?.operation?.cancel()
+            showImagePickerController()
+        }
+    }
+    
+    @IBAction func toggleReorderTableViewCells() {
+        let editing = !tableView.editing
+        reorderButton.setTitle(editing ? "完成调整" : "调整顺序", forState: .Normal)
+        tableView.editing = editing
+        tableView.reloadData()
+    }
+    
+    @IBAction func addStep() {
+        tableView.beginUpdates()
+        steps.append(FFStepObject())
+        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: tableView.numberOfRowsInSection(0), inSection: 0)], withRowAnimation: .Automatic)
+        tableView.endUpdates()
+    }
+    
+    func showImagePickerController() {
         let ac = UIAlertController(title: "您想从哪里获取图片？", message: nil, preferredStyle: .ActionSheet)
         let ipc = UIImagePickerController()
         ipc.delegate = self
@@ -406,19 +445,19 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
             self?.showDetailViewController(ipc, sender: self)
             return
         })
+        ac.addAction(UIAlertAction(title: "清除", style: .Cancel) {
+            [weak self] _ in
+            if let self_ = self {
+                self_.currentStep?.image = nil
+                self_.currentStep?.operation = nil
+                self_.currentStep?.attachID = nil
+                self_.currentStep?.uploaded = false
+                self_.currentStep?.uploadingProgresses = 0
+            }
+            return
+        })
         ac.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
         showDetailViewController(ac, sender: self)
-    }
-    
-    func removeDataAtIndex(index: Int) {
-        images.removeAtIndex(index)
-        attachIDs.removeAtIndex(index)
-        uploadingProgresses.removeAtIndex(index)
-        operations[index].cancel()
-        operations.removeAtIndex(index)
-        allUploaded.lock()
-        uploaded.removeAtIndex(index)
-        allUploaded.unlock()
     }
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -449,6 +488,14 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         if converting {
             return
         }
+        for step in steps {
+            if step.operation?.executing ?? false {
+                let ac = UIAlertController(title: "请稍等", message: "图片还未上传完成。", preferredStyle: .Alert)
+                ac.addAction(UIAlertAction(title: "好", style: .Default, handler: nil))
+                presentViewController(ac, animated: true, completion: nil)
+                return
+            }
+        }
         if tagsField?.textField.text ?? "" != "" {
             tokenField(tagsField, didReturnWithText: tagsField!.textField.text)
         }
@@ -458,58 +505,49 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                 [weak self] action in
                 if let self_ = self {
                     SVProgressHUD.showWithMaskType(.Gradient)
-                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-                        self_.allUploaded.lock()
-                        let count = self_.uploaded.count
-                        if !self_.uploaded.reduce(true, combine: { $0 && $1 }) {
-                            self_.allUploaded.wait()
+                    dispatch_async(dispatch_get_main_queue()) {
+                        if let text = self_.titleField?.text {
+                            self_.dataObject.title = text
                         }
-                        if count != self_.uploaded.count {
-                            self_.allUploaded.unlock()
-                            dispatch_async(dispatch_get_main_queue()) {
+                        if self_.tagsField != nil {
+                            var topics = Set<Topic>()
+                            for tag in self_.tags {
+                                let topic = Topic.temporaryObject()
+                                topic.title = tag
+                                topics.insert(topic)
+                            }
+                            self_.dataObject.topics = topics
+                        }
+                        var body = self_.bodyField.text ?? ""
+                        for (i, step) in enumerate(self_.steps) {
+                            body += "\n\n\(i + 1)."
+                            if let attachID = step.attachID {
+                                body += "[attach]\(attachID)[/attach]"
+                            }
+                            let texts = step.text.componentsSeparatedByString("\n")
+                            for text in texts {
+                                body += "\n  " + text
+                            }
+                        }
+                        self_.dataObject.body = body
+                        self_.dataObject.post(
+                            success: {
+                                question in
                                 SVProgressHUD.dismiss()
-                            }
-                            return
-                        } else {
-                            self_.allUploaded.unlock()
-                            dispatch_async(dispatch_get_main_queue()) {
-                                if let text = self_.titleField?.text {
-                                    self_.dataObject.title = text
+                                SVProgressHUD.showSuccessWithStatus("已发布", maskType: .Gradient)
+                                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC / 2)), dispatch_get_main_queue()) {
+                                    SVProgressHUD.dismiss()
+                                    self_.delegate?.publishmentViewControllerDidSuccessfullyPublishDataObject?(self_)
+                                    self_.dismissViewControllerAnimated(true, completion: nil)
                                 }
-                                if self_.tagsField != nil {
-                                    var topics = Set<Topic>()
-                                    for tag in self_.tags {
-                                        let topic = Topic.temporaryObject()
-                                        topic.title = tag
-                                        topics.insert(topic)
-                                    }
-                                    self_.dataObject.topics = topics
-                                }
-                                var body = self_.bodyField.text ?? ""
-                                for id in self_.attachIDs {
-                                    body += "\n[attach]\(id)[/attach]"
-                                }
-                                self_.dataObject.body = body
-                                self_.dataObject.post(
-                                    success: {
-                                        question in
-                                        SVProgressHUD.dismiss()
-                                        SVProgressHUD.showSuccessWithStatus("已发布", maskType: .Gradient)
-                                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC / 2)), dispatch_get_main_queue()) {
-                                            SVProgressHUD.dismiss()
-                                            self_.delegate?.publishmentViewControllerDidSuccessfullyPublishDataObject?(self_)
-                                            self_.dismissViewControllerAnimated(true, completion: nil)
-                                        }
-                                    },
-                                    failure: {
-                                        error in
-                                        SVProgressHUD.dismiss()
-                                        let ac = UIAlertController(title: "发布失败", message: error.userInfo?[NSLocalizedDescriptionKey] as? String ?? "未知错误。", preferredStyle: .Alert)
-                                        ac.addAction(UIAlertAction(title: "好", style: .Default, handler: nil))
-                                        self_.presentViewController(ac, animated: true, completion: nil)
-                                    })
-                            }
-                        }
+                            },
+                            failure: {
+                                error in
+                                SVProgressHUD.dismiss()
+                                let ac = UIAlertController(title: "发布失败", message: error.userInfo?[NSLocalizedDescriptionKey] as? String ?? "未知错误。", preferredStyle: .Alert)
+                                ac.addAction(UIAlertAction(title: "好", style: .Default, handler: nil))
+                                self_.presentViewController(ac, animated: true, completion: nil)
+                        })
                     }
                 }
             })
