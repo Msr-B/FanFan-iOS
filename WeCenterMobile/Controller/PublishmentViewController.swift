@@ -73,7 +73,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     @IBOutlet weak var tagsLabel: UILabel?
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var imagesLabel: UILabel!
-    @IBOutlet weak var separator: UIView!
+    @IBOutlet weak var separatorA: UIView!
+    @IBOutlet weak var separatorB: UIView!
     @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var reorderButton: UIButton!
     @IBOutlet weak var addButton: UIButton!
@@ -104,6 +105,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     var steps = [FFStepObject()] // initialized with 1 step
     var currentStep: FFStepObject? = nil
     
+    var currentTextView: UITextView?
+    
     func cells(i: Int) -> FFPublishmentStepCell? {
         return tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as? FFPublishmentStepCell
     }
@@ -125,7 +128,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         tagsField?.textField.textColor = theme.subtitleTextColor
         tagsField?.textField.font = UIFont.systemFontOfSize(14)
         bodyField.textColor = theme.bodyTextColor
-        separator.backgroundColor = theme.borderColorA
+        separatorA.backgroundColor = theme.borderColorA
+        separatorB.backgroundColor = theme.borderColorA
         publishButton.addTarget(self, action: "publish", forControlEvents: .TouchUpInside)
         dismissButton.addTarget(self, action: "dismiss", forControlEvents: .TouchUpInside)
         reorderButton.backgroundColor = theme.backgroundColorB
@@ -164,6 +168,11 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillChangeFrame:", name: UIKeyboardWillChangeFrameNotification, object: nil)
         tagsField?.reloadData()
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        tableView.editing = false
     }
     
     // MARK: - ZFTokenFieldDataSource
@@ -319,12 +328,22 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     
     // MARK: - UITextViewDelegate
     
+    func textViewShouldBeginEditing(textView: UITextView) -> Bool {
+        currentTextView = textView
+        return true
+    }
+    
+    func textViewDidBeginEditing(textView: UITextView) {
+        scrollCursorToVisibleInTextView(textView)
+    }
+    
     func textViewDidChange(textView: UITextView) {
         if let indexPath = tableView.indexPathForRowAtPoint(textView.convertPoint(CGPointZero, toView: tableView)) {
             steps[indexPath.row].text = textView.text
         }
         tableView.beginUpdates()
         tableView.endUpdates()
+        scrollCursorToVisibleInTextView(textView)
     }
     
     // MARK: - UIImagePickerControllerDelegate
@@ -393,7 +412,6 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                             }
                             step.operation = operation
                         }
-                        //                    self_.imageCollectionView.reloadData()
                         self_.converting = false
                         SVProgressHUD.dismiss()
                     }
@@ -565,8 +583,20 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                 let bottom = UIScreen.mainScreen().bounds.height - info.frameEnd.minY
                 self_.bottomConstraint.constant = bottom
                 self_.view.layoutIfNeeded()
+                if let textView = self_.currentTextView {
+                    self_.scrollCursorToVisibleInTextView(textView)
+                }
             }
             return
+        }
+    }
+    
+    func scrollCursorToVisibleInTextView(textView: UITextView) {
+        if let position = textView.selectedTextRange?.start {
+            var cursorRect = textView.caretRectForPosition(position)
+            cursorRect = scrollView.convertRect(cursorRect, fromView: textView)
+            cursorRect = cursorRect.rectByInsetting(dx: -20, dy: -20)
+            scrollView.scrollRectToVisible(cursorRect, animated: true)
         }
     }
     

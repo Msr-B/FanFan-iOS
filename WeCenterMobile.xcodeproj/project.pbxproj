@@ -274,6 +274,7 @@
 		959FCB621AEE4EB300299AA6 /* UIColor+MSRGetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 959FCB611AEE4EB300299AA6 /* UIColor+MSRGetter.swift */; };
 		95A3AAFB1B047F3F00ADF705 /* GBDeviceInfo_Common.m in Sources */ = {isa = PBXBuildFile; fileRef = 95A3AAF01B047F3E00ADF705 /* GBDeviceInfo_Common.m */; };
 		95A3AAFC1B047F3F00ADF705 /* GBDeviceInfo_iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 95A3AAF21B047F3E00ADF705 /* GBDeviceInfo_iOS.m */; };
+		95B0E9491B7C9EE20050DD2C /* MSRTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B0E9481B7C9EE20050DD2C /* MSRTextView.swift */; };
 		95B9BDC31ABAA67900692889 /* PublishmentViewControllerA.xib in Resources */ = {isa = PBXBuildFile; fileRef = 95B9BDC21ABAA67900692889 /* PublishmentViewControllerA.xib */; };
 		95B9BE681ABAEF1A00692889 /* ZFTokenField.m in Sources */ = {isa = PBXBuildFile; fileRef = 95B9BE671ABAEF1A00692889 /* ZFTokenField.m */; };
 		95C2EA1E1AB0516800F2A326 /* Array+MSRAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C2E9F31AB0516800F2A326 /* Array+MSRAccessor.swift */; };
@@ -852,6 +853,7 @@
 		95A3AAF71B047F3F00ADF705 /* GBDeviceInfoTypes_Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBDeviceInfoTypes_Common.h; sourceTree = "<group>"; };
 		95A3AAF81B047F3F00ADF705 /* GBDeviceInfoTypes_iOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBDeviceInfoTypes_iOS.h; sourceTree = "<group>"; };
 		95A3AAFE1B04801100ADF705 /* GBDeviceInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GBDeviceInfo.h; sourceTree = "<group>"; };
+		95B0E9481B7C9EE20050DD2C /* MSRTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSRTextView.swift; sourceTree = "<group>"; };
 		95B9BDC21ABAA67900692889 /* PublishmentViewControllerA.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PublishmentViewControllerA.xib; sourceTree = "<group>"; };
 		95B9BE661ABAEF1A00692889 /* ZFTokenField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZFTokenField.h; sourceTree = "<group>"; };
 		95B9BE671ABAEF1A00692889 /* ZFTokenField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZFTokenField.m; sourceTree = "<group>"; };
@@ -1985,6 +1987,7 @@
 				95C2EA111AB0516800F2A326 /* MSRSegmentedControlUnderlineIndicator.swift */,
 				95C2EA121AB0516800F2A326 /* MSRSegmentedViewController.swift */,
 				95F2F6551B47C07E0012DBFD /* MSRTableView.swift */,
+				95B0E9481B7C9EE20050DD2C /* MSRTextView.swift */,
 				9583E3341AB6812400067F37 /* MSRLayoutGuide.swift */,
 				95C893761AC7365D00B7B385 /* MSRSidebar.swift */,
 				95C47D4A1AC9C2BE00A56879 /* UIButton+MSRSetter.swift */,
@@ -2454,6 +2457,7 @@
 				950FE5051A1DA2B500167D09 /* ExploreViewController.swift in Sources */,
 				95ED5F111B084D0E00CDB225 /* UIProgressView+AFNetworking.m in Sources */,
 				951D1E751ACD1E4E0072D555 /* DTAccessibilityElement.m in Sources */,
+				95B0E9491B7C9EE20050DD2C /* MSRTextView.swift in Sources */,
 				951D1EA21ACD1E4E0072D555 /* NSAttributedString+DTCoreText.m in Sources */,
 				95C2EA421AB0516800F2A326 /* UIImage+MSRShape.swift in Sources */,
 				951D1EA81ACD1E4E0072D555 /* NSCoder+DTCompatibility.m in Sources */,

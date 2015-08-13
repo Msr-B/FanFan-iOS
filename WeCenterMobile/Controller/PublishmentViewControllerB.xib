@@ -85,7 +85,7 @@
                                             <constraint firstAttribute="width" constant="1" id="YRp-9j-v6P"/>
                                         </constraints>
                                     </view>
-                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PnK-Ba-gg9">
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PnK-Ba-gg9" customClass="MSRTextView" customModule="WeCenterMobile" customModuleProvider="target">
                                         <rect key="frame" x="81" y="72" width="499" height="33"/>
                                         <color key="backgroundColor" red="0.96078431369999995" green="0.96078431369999995" blue="0.96078431369999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
@@ -95,7 +95,11 @@
                                             <userDefinedRuntimeAttribute type="number" keyPath="msr_borderWidth">
                                                 <real key="value" value="0.5"/>
                                             </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="输入描述正文"/>
                                         </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <outlet property="delegate" destination="rGX-cd-8YN" id="TqU-OQ-lPe"/>
+                                        </connections>
                                     </textView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1hb-Fs-GTt">
                                         <rect key="frame" x="81" y="115" width="499" height="33"/>
@@ -215,7 +219,8 @@
                 <outlet property="publishButton" destination="oke-sH-xSR" id="Ne8-fF-rpD"/>
                 <outlet property="reorderButton" destination="1hb-Fs-GTt" id="A9f-Td-35I"/>
                 <outlet property="scrollView" destination="jQQ-J6-fNP" id="c5i-kR-mVC"/>
-                <outlet property="separator" destination="bzn-9r-Zkk" id="iGU-W3-CGo"/>
+                <outlet property="separatorA" destination="bzn-9r-Zkk" id="R0h-fR-hcY"/>
+                <outlet property="separatorB" destination="67f-HN-zR2" id="7dZ-fh-GNR"/>
                 <outlet property="tableView" destination="kmx-oH-goi" id="2Ov-Ey-jtR"/>
             </connections>
             <point key="canvasLocation" x="870" y="1697"/>
