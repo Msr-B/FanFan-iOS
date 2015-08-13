@@ -104,6 +104,10 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     var steps = [FFStepObject()] // initialized with 1 step
     var currentStep: FFStepObject? = nil
     
+    func cells(i: Int) -> FFPublishmentStepCell? {
+        return tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as? FFPublishmentStepCell
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         let theme = SettingsManager.defaultManager.currentTheme
@@ -263,9 +267,6 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
         var a = sourceIndexPath.row
         var b = destinationIndexPath.row
-        let cells: (Int) -> FFPublishmentStepCell? = {
-            tableView.cellForRowAtIndexPath(NSIndexPath(forRow: $0, inSection: 0)) as? FFPublishmentStepCell
-        }
         cells(a)?.stepIndexLabel.text = "\(b + 1)"
         if a < b {
             for i in a + 1...b {
@@ -291,16 +292,13 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         let deleteAction = UITableViewRowAction(style: .Default, title: "删除") {
             [weak self] action, indexPath in
             if let self_ = self {
-                let cells: (Int) -> FFPublishmentStepCell? = {
-                    self_.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: $0, inSection: 0)) as? FFPublishmentStepCell
-                }
                 let rows = self_.tableView.numberOfRowsInSection(0)
                 self_.tableView.beginUpdates()
                 self_.steps[indexPath.row].operation?.cancel()
                 self_.steps.removeAtIndex(indexPath.row)
                 if indexPath.row < rows - 1 {
                     for i in indexPath.row + 1..<rows {
-                        cells(i)?.stepIndexLabel.text = "\(i)"
+                        self_.cells(i)?.stepIndexLabel.text = "\(i)"
                     }
                 }
                 self_.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
@@ -388,11 +386,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                             operation.setUploadProgressBlock() {
                                 bytesWritten, totalBytesWritten, totalBytesExpectedToWrite in
                                 step.uploadingProgresses = Int(totalBytesWritten * Int64(FFStepObject.maxProgress) / totalBytesExpectedToWrite)
-                                let cells: (Int) -> FFPublishmentStepCell? = {
-                                    self_.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: $0, inSection: 0)) as? FFPublishmentStepCell
-                                }
                                 if let index = find(self_.steps, step) {
-                                    cells(index)?.updateProgress(step: step)
+                                    self_.cells(index)?.updateProgress(step: step)
                                 }
                                 return
                             }
@@ -445,14 +440,19 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
             self?.showDetailViewController(ipc, sender: self)
             return
         })
-        ac.addAction(UIAlertAction(title: "清除", style: .Cancel) {
+        ac.addAction(UIAlertAction(title: "清除", style: .Destructive) {
             [weak self] _ in
             if let self_ = self {
-                self_.currentStep?.image = nil
-                self_.currentStep?.operation = nil
-                self_.currentStep?.attachID = nil
-                self_.currentStep?.uploaded = false
-                self_.currentStep?.uploadingProgresses = 0
+                if let step = self_.currentStep {
+                    step.image = nil
+                    step.operation = nil
+                    step.attachID = nil
+                    step.uploaded = false
+                    step.uploadingProgresses = 0
+                    if let index = find(self_.steps, step) {
+                        self_.cells(index)?.update(step: step)
+                    }
+                }
             }
             return
         })
