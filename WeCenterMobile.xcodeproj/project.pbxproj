@@ -189,6 +189,7 @@
 		95C893771AC7365D00B7B385 /* MSRSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C893761AC7365D00B7B385 /* MSRSidebar.swift */; };
 		95CC83D21B7DEC23007CA4CA /* DTCoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95CC83B31B7DEBD4007CA4CA /* DTCoreText.framework */; };
 		95CC83D31B7DEC23007CA4CA /* DTCoreText.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 95CC83B31B7DEBD4007CA4CA /* DTCoreText.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		95CC83D71B7DF0C8007CA4CA /* MSRTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95CC83D61B7DF0C8007CA4CA /* MSRTableView.swift */; };
 		95D153A41AF4BB3000C1617D /* ArticleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D153A31AF4BB3000C1617D /* ArticleViewController.swift */; };
 		95D153A71AF4CEF800C1617D /* ArticleHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D153A61AF4CEF800C1617D /* ArticleHeaderView.swift */; };
 		95D7840A1B1C5306008EB241 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D784091B1C5306008EB241 /* Theme.swift */; };
@@ -768,6 +769,7 @@
 		95C2EA1B1AB0516800F2A326 /* UIView+MSREasyAutoLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+MSREasyAutoLayout.swift"; sourceTree = "<group>"; };
 		95C47D4A1AC9C2BE00A56879 /* UIButton+MSRSetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+MSRSetter.swift"; sourceTree = "<group>"; };
 		95C893761AC7365D00B7B385 /* MSRSidebar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSRSidebar.swift; sourceTree = "<group>"; };
+		95CC83D61B7DF0C8007CA4CA /* MSRTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSRTableView.swift; sourceTree = "<group>"; };
 		95D153A31AF4BB3000C1617D /* ArticleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ArticleViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		95D153A61AF4CEF800C1617D /* ArticleHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ArticleHeaderView.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		95D784091B1C5306008EB241 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -1497,6 +1499,7 @@
 				95891E5C1AD83ADA007D5DF7 /* MSRCollectionView.swift */,
 				95C2EA051AB0516800F2A326 /* MSRFrameEdge.swift */,
 				958600841B1736FB0054DAA8 /* MSRKeyboardBar.swift */,
+				9583E3341AB6812400067F37 /* MSRLayoutGuide.swift */,
 				95C2EA071AB0516800F2A326 /* MSRLoadMoreControl.swift */,
 				95F380C61AB33CC50070A7FB /* MSRMultilineLabel.swift */,
 				95C2EA081AB0516800F2A326 /* MSRNavigationController.swift */,
@@ -1512,9 +1515,9 @@
 				95C2EA101AB0516800F2A326 /* MSRSegmentedControlRainbowBlockIndicator.swift */,
 				95C2EA111AB0516800F2A326 /* MSRSegmentedControlUnderlineIndicator.swift */,
 				95C2EA121AB0516800F2A326 /* MSRSegmentedViewController.swift */,
-				954FEAB71B7B3BF9005D9792 /* MSRTextView.swift */,
-				9583E3341AB6812400067F37 /* MSRLayoutGuide.swift */,
 				95C893761AC7365D00B7B385 /* MSRSidebar.swift */,
+				95CC83D61B7DF0C8007CA4CA /* MSRTableView.swift */,
+				954FEAB71B7B3BF9005D9792 /* MSRTextView.swift */,
 				95C47D4A1AC9C2BE00A56879 /* UIButton+MSRSetter.swift */,
 				959FCB611AEE4EB300299AA6 /* UIColor+MSRGetter.swift */,
 				95C2EA151AB0516800F2A326 /* UIColor+MSRMaterialColor.swift */,
@@ -2228,6 +2231,7 @@
 				9531D7261AF3E4AC00E6549D /* CommentCell.swift in Sources */,
 				95DC571B1AF8AD4D0075C3CB /* NSObject+MSRUserInfo.swift in Sources */,
 				95C2EA1E1AB0516800F2A326 /* Array+MSRAccessor.swift in Sources */,
+				95CC83D71B7DF0C8007CA4CA /* MSRTableView.swift in Sources */,
 				956E70EF1AAFC4E100A3FD7D /* WeCenterMobile.xcdatamodeld in Sources */,
 				950FE5041A1DA2B500167D09 /* CommetListViewController.swift in Sources */,
 				951DA7571AEAAE6300F0E3A7 /* MSRRoundedImageView.swift in Sources */,
