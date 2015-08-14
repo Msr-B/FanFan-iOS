@@ -15,7 +15,7 @@ class FFPublishmentStepCell: UITableViewCell, UITextViewDelegate {
     @IBOutlet weak var titleImageView: UIImageView!
     @IBOutlet weak var titleImageButton: UIButton!
     @IBOutlet weak var progressView: EAColourfulProgressView!
-    @IBOutlet weak var textView: UITextView!
+    @IBOutlet weak var textView: MSRTextView!
     @IBOutlet weak var separator: UIView!
     
     override func awakeFromNib() {
@@ -25,6 +25,10 @@ class FFPublishmentStepCell: UITableViewCell, UITextViewDelegate {
         textView.backgroundColor = theme.backgroundColorB
         textView.msr_borderColor = theme.borderColorA
         textView.textColor = theme.bodyTextColor
+        textView.attributedPlaceholder = NSAttributedString(string: textView.placeholder ?? "",
+            attributes: [
+                NSForegroundColorAttributeName: theme.footnoteTextColor,
+                NSFontAttributeName: textView.font])
         separator.backgroundColor = theme.borderColorA
         titleImageButton.tintColor = theme.backgroundColorA
         titleImageButton.msr_borderColor = theme.borderColorA

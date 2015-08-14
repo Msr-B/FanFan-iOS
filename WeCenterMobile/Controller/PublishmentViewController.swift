@@ -67,8 +67,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var tagsField: ZFTokenField?
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var titleField: UITextView?
-    @IBOutlet weak var bodyField: UITextView!
+    @IBOutlet weak var titleField: MSRTextView?
+    @IBOutlet weak var bodyField: MSRTextView!
     @IBOutlet weak var titleLabel: UILabel?
     @IBOutlet weak var tagsLabel: UILabel?
     @IBOutlet weak var descriptionLabel: UILabel!
@@ -125,11 +125,19 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
             v?.textColor = theme.subtitleTextColor
         }
         titleField?.textColor = theme.titleTextColor
+        titleField?.attributedPlaceholder = NSAttributedString(string: titleField!.placeholder ?? "",
+            attributes: [
+                NSForegroundColorAttributeName: theme.footnoteTextColor,
+                NSFontAttributeName: titleField!.font])
         tagsField?.textField.textColor = theme.subtitleTextColor
         tagsField?.textField.font = UIFont.systemFontOfSize(14)
         bodyField.textColor = theme.bodyTextColor
         separatorA.backgroundColor = theme.borderColorA
         separatorB.backgroundColor = theme.borderColorA
+        bodyField.attributedPlaceholder = NSAttributedString(string: bodyField.placeholder ?? "",
+            attributes: [
+                NSForegroundColorAttributeName: theme.footnoteTextColor,
+                NSFontAttributeName: bodyField.font])
         publishButton.addTarget(self, action: "publish", forControlEvents: .TouchUpInside)
         dismissButton.addTarget(self, action: "dismiss", forControlEvents: .TouchUpInside)
         reorderButton.backgroundColor = theme.backgroundColorB
