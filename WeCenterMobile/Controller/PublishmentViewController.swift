@@ -167,8 +167,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         tableView.estimatedRowHeight = 200
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.registerNib(UINib(nibName: "FFPublishmentStepCell", bundle: NSBundle.mainBundle()), forCellReuseIdentifier: SelfType.cellReuseIdentifier)
-        tableView.delaysContentTouches = false
-        tableView.msr_wrapperView?.delaysContentTouches = false
+        tableView.delaysContentTouches = true // To prevent button touches cancelling the swipe-to-delete gesture.
         tableView.msr_setTouchesShouldCancel(true, inContentViewWhichIsKindOfClass: UIButton.self)
     }
     
