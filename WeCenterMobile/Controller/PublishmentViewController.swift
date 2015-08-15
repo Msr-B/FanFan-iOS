@@ -61,9 +61,6 @@ func ==(lhs: FFStepObject, rhs: FFStepObject) -> Bool {
 
 class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTokenFieldDelegate, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate, UITextViewDelegate {
     
-    @IBOutlet weak var headerLabel: UILabel!
-    @IBOutlet weak var publishButton: UIButton!
-    @IBOutlet weak var dismissButton: UIButton!
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var tagsField: ZFTokenField?
     @IBOutlet weak var tableView: UITableView!
@@ -120,7 +117,6 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
             v?.msr_borderColor = theme.borderColorA
             v?.backgroundColor = theme.backgroundColorB
         }
-        headerLabel.textColor = theme.titleTextColor
         for v in [titleLabel, tagsLabel, descriptionLabel, imagesLabel] {
             v?.textColor = theme.subtitleTextColor
         }
@@ -138,15 +134,18 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
             attributes: [
                 NSForegroundColorAttributeName: theme.footnoteTextColor,
                 NSFontAttributeName: bodyField.font])
-        publishButton.addTarget(self, action: "publish", forControlEvents: .TouchUpInside)
-        dismissButton.addTarget(self, action: "dismiss", forControlEvents: .TouchUpInside)
+        let publishButton = UIBarButtonItem(title: "发布", style: .Done, target: self, action: "publish")
+        let dismissButton = UIBarButtonItem(title: "取消", style: .Plain, target: self, action: "dismiss")
+        dismissButton.setTitleTextAttributes([
+            NSForegroundColorAttributeName: %+0xbf360c],
+            forState: .Normal)
+        navigationItem.leftBarButtonItem = dismissButton
+        navigationItem.rightBarButtonItem = publishButton
         reorderButton.backgroundColor = theme.backgroundColorB
         reorderButton.setTitleColor(theme.subtitleTextColor, forState: .Normal)
         addButton.backgroundColor = theme.backgroundColorB
         addButton.setTitleColor(theme.subtitleTextColor, forState: .Normal)
-        publishButton.backgroundColor = theme.backgroundColorB
-        publishButton.setTitleColor(theme.subtitleTextColor, forState: .Normal)
-        for v in [reorderButton, addButton, publishButton, dismissButton] {
+        for v in [reorderButton, addButton] {
             v.msr_setBackgroundImageWithColor(theme.highlightColor, forState: .Highlighted)
             v.msr_borderColor = theme.borderColorA
         }
@@ -160,7 +159,6 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
             v?.keyboardAppearance = theme.keyboardAppearance
         }
         scrollView.delaysContentTouches = false
-        scrollView.scrollIndicatorInsets.top = 20
         scrollView.msr_setTouchesShouldCancel(true, inContentViewWhichIsKindOfClass: UIButton.self)
         let tap = UITapGestureRecognizer(target: self, action: "didTouchBlankArea")
         scrollView.addGestureRecognizer(tap)

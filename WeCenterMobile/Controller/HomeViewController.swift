@@ -108,8 +108,9 @@ class HomeViewController: UITableViewController, PublishmentViewControllerDelega
             let vc = NSBundle.mainBundle().loadNibNamed("PublishmentViewControllerA", owner: nil, options: nil).first as! PublishmentViewController
             vc.delegate = self
             vc.dataObject = object
-            vc.headerLabel.text = title
-            self?.presentViewController(vc, animated: true, completion: nil)
+            vc.title = title
+            let nc = UINavigationController(rootViewController: vc)
+            self?.presentViewController(nc, animated: true, completion: nil)
         }
         ac.addAction(UIAlertAction(title: "问题", style: .Default) {
             action in

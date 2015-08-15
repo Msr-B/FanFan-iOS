@@ -227,8 +227,9 @@ class QuestionViewController: UITableViewController, DTLazyImageViewDelegate, Qu
         answer.question!.id = question.id
         apc.delegate = self
         apc.dataObject = answer
-        apc.headerLabel.text = "发布回答"
-        showDetailViewController(apc, sender: self)
+        apc.title = "发布回答"
+        let nc = UINavigationController(rootViewController: apc)
+        showDetailViewController(nc, sender: self)
     }
     
     func publishmentViewControllerDidSuccessfullyPublishDataObject(publishmentViewController: PublishmentViewController) {
