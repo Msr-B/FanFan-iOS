@@ -158,6 +158,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         for v in [UITextView?](arrayLiteral: titleField, bodyField) {
             v?.keyboardAppearance = theme.keyboardAppearance
         }
+        scrollView.indicatorStyle = theme.scrollViewIndicatorStyle
         scrollView.delaysContentTouches = false
         scrollView.msr_setTouchesShouldCancel(true, inContentViewWhichIsKindOfClass: UIButton.self)
         let tap = UITapGestureRecognizer(target: self, action: "didTouchBlankArea")
