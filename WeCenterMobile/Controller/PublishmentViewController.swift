@@ -18,7 +18,7 @@ import ZFTokenField
     var title: String? { get set }
     var body: String? { get set }
     var attachmentKey: String? { get set }
-    func post(#success: (() -> Void)?, failure: ((NSError) -> Void)?)
+    func post(success success: (() -> Void)?, failure: ((NSError) -> Void)?)
     func uploadImageWithJPEGData(jpegData: NSData, success: ((Int) -> Void)?, failure: ((NSError) -> Void)?) -> AFHTTPRequestOperation
 }
 
@@ -124,7 +124,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         titleField?.attributedPlaceholder = NSAttributedString(string: titleField!.placeholder ?? "",
             attributes: [
                 NSForegroundColorAttributeName: theme.footnoteTextColor,
-                NSFontAttributeName: titleField!.font])
+                NSFontAttributeName: titleField!.font!])
         tagsField?.textField.textColor = theme.subtitleTextColor
         tagsField?.textField.font = UIFont.systemFontOfSize(14)
         bodyField.textColor = theme.bodyTextColor
@@ -133,7 +133,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         bodyField.attributedPlaceholder = NSAttributedString(string: bodyField.placeholder ?? "",
             attributes: [
                 NSForegroundColorAttributeName: theme.footnoteTextColor,
-                NSFontAttributeName: bodyField.font])
+                NSFontAttributeName: bodyField.font!])
         let publishButton = UIBarButtonItem(title: "发布", style: .Done, target: self, action: "publish")
         let dismissButton = UIBarButtonItem(title: "取消", style: .Plain, target: self, action: "dismiss")
         dismissButton.setTitleTextAttributes([
@@ -280,8 +280,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     }
     
     func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
-        var a = sourceIndexPath.row
-        var b = destinationIndexPath.row
+        let a = sourceIndexPath.row
+        let b = destinationIndexPath.row
         cells(a)?.stepIndexLabel.text = "\(b + 1)"
         if a < b {
             for i in a + 1...b {
@@ -303,7 +303,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     
     // MARK: - UITableViewDelegate
     
-    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
+    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
         let deleteAction = UITableViewRowAction(style: .Default, title: "删除") {
             [weak self] action, indexPath in
             if let self_ = self {
@@ -354,38 +354,36 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
     
     // MARK: - UIImagePickerControllerDelegate
     
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
-        SVProgressHUD.showWithMaskType(.Gradient)
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        SVProgressHUD.show()
         picker.dismissViewControllerAnimated(true, completion: nil)
         converting = true
         if let step = currentStep {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 [weak self] in
                 if let self_ = self {
-                    var images = map([info[UIImagePickerControllerOriginalImage] as! UIImage]) {
+                    let images = [info[UIImagePickerControllerOriginalImage] as! UIImage].map {
                         (image: UIImage) -> UIImage in
                         let scale = min(1, min(SelfType.maxImageSideLength / image.size.width, SelfType.maxImageSideLength / image.size.height))
                         let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
                         return image.msr_imageOfSize(size)
                     }
-                    var uploadingProgress = [0]
-                    var uploaded = [false]
-                    var attachIDs: [Int?] = [nil]
-                    let jpegs = map(images) {
+                    let uploadingProgress = [0]
+                    let attachIDs: [Int?] = [nil]
+                    let jpegs = images.map {
                         return UIImageJPEGRepresentation($0, SelfType.imageCompressionQuality)
                     }
                     dispatch_async(dispatch_get_main_queue()) {
-                        [weak self] in
+//                        [weak self] in
                         step.image = images.first!
                         step.uploadingProgresses = uploadingProgress.first!
                         step.attachID = attachIDs.first!
-                        if let index = find(self_.steps, step) {
+                        if let index = self_.steps.indexOf(step) {
                             self_.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
                         }
                         for i in 0..<images.count {
-                            let image = images[i]
                             let jpeg = jpegs[i]
-                            let operation = self_.dataObject.uploadImageWithJPEGData(jpeg,
+                            let operation = self_.dataObject.uploadImageWithJPEGData(jpeg!,
                                 success: {
                                     attachID in
                                     step.attachID = attachID
@@ -393,7 +391,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                                 },
                                 failure: {
                                     error in
-                                    var message = error.userInfo?[NSLocalizedDescriptionKey] as? String
+                                    var message = error.userInfo[NSLocalizedDescriptionKey] as? String
                                     if message == nil && error.code != NSURLErrorCancelled {
                                         message = "未知错误。"
                                     }
@@ -403,7 +401,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                                         self_.presentViewController(ac, animated: true, completion: nil)
                                     }
                                     step.image = nil
-                                    if let index = find(self_.steps, step) {
+                                    if let index = self_.steps.indexOf(step) {
                                         self_.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
                                     }
                                     return
@@ -411,7 +409,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                             operation.setUploadProgressBlock() {
                                 bytesWritten, totalBytesWritten, totalBytesExpectedToWrite in
                                 step.uploadingProgresses = Int(totalBytesWritten * Int64(FFStepObject.maxProgress) / totalBytesExpectedToWrite)
-                                if let index = find(self_.steps, step) {
+                                if let index = self_.steps.indexOf(step) {
                                     self_.cells(index)?.updateProgress(step: step)
                                 }
                                 return
@@ -473,7 +471,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                     step.attachID = nil
                     step.uploaded = false
                     step.uploadingProgresses = 0
-                    if let index = find(self_.steps, step) {
+                    if let index = self_.steps.indexOf(step) {
                         self_.cells(index)?.update(step: step)
                     }
                 }
@@ -528,7 +526,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
             /* handler: */ {
                 [weak self] action in
                 if let self_ = self {
-                    SVProgressHUD.showWithMaskType(.Gradient)
+                    SVProgressHUD.show()
+                    SVProgressHUD.setDefaultMaskType(.Gradient)
                     dispatch_async(dispatch_get_main_queue()) {
                         if let text = self_.titleField?.text {
                             self_.dataObject.title = text
@@ -543,7 +542,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                             self_.dataObject.topics = topics
                         }
                         var body = self_.bodyField.text ?? ""
-                        for (i, step) in enumerate(self_.steps) {
+                        for (i, step) in self_.steps.enumerate() {
                             body += "\n\n\(i + 1)."
                             if let attachID = step.attachID {
                                 body += "[attach]\(attachID)[/attach]"
@@ -558,7 +557,8 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                             success: {
                                 question in
                                 SVProgressHUD.dismiss()
-                                SVProgressHUD.showSuccessWithStatus("已发布", maskType: .Gradient)
+                                SVProgressHUD.showSuccessWithStatus("已发布")
+                                SVProgressHUD.setDefaultMaskType(.Gradient)
                                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC / 2)), dispatch_get_main_queue()) {
                                     SVProgressHUD.dismiss()
                                     self_.delegate?.publishmentViewControllerDidSuccessfullyPublishDataObject?(self_)
@@ -568,7 +568,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                             failure: {
                                 error in
                                 SVProgressHUD.dismiss()
-                                let ac = UIAlertController(title: "发布失败", message: error.userInfo?[NSLocalizedDescriptionKey] as? String ?? "未知错误。", preferredStyle: .Alert)
+                                let ac = UIAlertController(title: "发布失败", message: error.userInfo[NSLocalizedDescriptionKey] as? String ?? "未知错误。", preferredStyle: .Alert)
                                 ac.addAction(UIAlertAction(title: "好", style: .Default, handler: nil))
                                 self_.presentViewController(ac, animated: true, completion: nil)
                         })
@@ -601,7 +601,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
         if let position = textView.selectedTextRange?.start {
             var cursorRect = textView.caretRectForPosition(position)
             cursorRect = scrollView.convertRect(cursorRect, fromView: textView)
-            cursorRect = cursorRect.rectByInsetting(dx: -20, dy: -20)
+            cursorRect = cursorRect.insetBy(dx: -20, dy: -20)
             scrollView.scrollRectToVisible(cursorRect, animated: true)
         }
     }

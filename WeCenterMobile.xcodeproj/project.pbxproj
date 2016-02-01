@@ -281,6 +281,13 @@
 		95ED5F401B084F7500CDB225 /* RMActionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 95ED5F3F1B084F7500CDB225 /* RMActionController.m */; };
 		95F380BB1AB269690070A7FB /* FeaturedObjectListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F380BA1AB269690070A7FB /* FeaturedObjectListViewController.swift */; };
 		95F380C71AB33CC50070A7FB /* MSRMultilineLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F380C61AB33CC50070A7FB /* MSRMultilineLabel.swift */; };
+		A90F99521C5C4CE60079BEE8 /* ArticleCommentaryActionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90F99501C5C4CE60079BEE8 /* ArticleCommentaryActionCell.swift */; };
+		A90F99531C5C4CE60079BEE8 /* ArticleCommentaryActionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A90F99511C5C4CE60079BEE8 /* ArticleCommentaryActionCell.xib */; };
+		A90F99761C5C53130079BEE8 /* ArticleCommentaryAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90F99751C5C53130079BEE8 /* ArticleCommentaryAction.swift */; };
+		A90F99781C5C535D0079BEE8 /* HotTopicViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90F99771C5C535D0079BEE8 /* HotTopicViewController.swift */; };
+		A90F997A1C5C53890079BEE8 /* HotTopicListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90F99791C5C53890079BEE8 /* HotTopicListViewController.swift */; };
+		A9E3F6AD1C5BBBA100FF0BB3 /* AppSecret.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E3F6AC1C5BBBA100FF0BB3 /* AppSecret.swift */; };
+		A9F63E641C5C563E001F8AC7 /* SVRadialGradientLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A9F63E631C5C563E001F8AC7 /* SVRadialGradientLayer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -906,6 +913,14 @@
 		95ED5F3F1B084F7500CDB225 /* RMActionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMActionController.m; sourceTree = "<group>"; };
 		95F380BA1AB269690070A7FB /* FeaturedObjectListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeaturedObjectListViewController.swift; sourceTree = "<group>"; };
 		95F380C61AB33CC50070A7FB /* MSRMultilineLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSRMultilineLabel.swift; sourceTree = "<group>"; };
+		A90F99501C5C4CE60079BEE8 /* ArticleCommentaryActionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleCommentaryActionCell.swift; sourceTree = "<group>"; };
+		A90F99511C5C4CE60079BEE8 /* ArticleCommentaryActionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ArticleCommentaryActionCell.xib; sourceTree = "<group>"; };
+		A90F99751C5C53130079BEE8 /* ArticleCommentaryAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleCommentaryAction.swift; sourceTree = "<group>"; };
+		A90F99771C5C535D0079BEE8 /* HotTopicViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HotTopicViewController.swift; sourceTree = "<group>"; };
+		A90F99791C5C53890079BEE8 /* HotTopicListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HotTopicListViewController.swift; sourceTree = "<group>"; };
+		A9E3F6AC1C5BBBA100FF0BB3 /* AppSecret.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppSecret.swift; sourceTree = "<group>"; };
+		A9F63E411C5C561C001F8AC7 /* SVRadialGradientLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SVRadialGradientLayer.h; sourceTree = "<group>"; };
+		A9F63E631C5C563E001F8AC7 /* SVRadialGradientLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVRadialGradientLayer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -968,6 +983,8 @@
 				950FE12D1A1DA2B300167D09 /* ExploreViewController.swift */,
 				95F380BA1AB269690070A7FB /* FeaturedObjectListViewController.swift */,
 				95E535591A49DCFD00D7B76B /* HomeViewController.swift */,
+				A90F99791C5C53890079BEE8 /* HotTopicListViewController.swift */,
+				A90F99771C5C535D0079BEE8 /* HotTopicViewController.swift */,
 				95DFA7031B1224BC00DF1C0E /* LoginViewController.swift */,
 				95DFA7041B1224BC00DF1C0E /* LoginViewController.xib */,
 				950FE12F1A1DA2B300167D09 /* MainViewController.swift */,
@@ -1167,6 +1184,8 @@
 				9531D6F01AF3E4AC00E6549D /* QuestionFocusingActionCell.xib */,
 				9531D6F11AF3E4AC00E6549D /* QuestionPublishmentActionCell.swift */,
 				9531D6F21AF3E4AC00E6549D /* QuestionPublishmentActionCell.xib */,
+				A90F99501C5C4CE60079BEE8 /* ArticleCommentaryActionCell.swift */,
+				A90F99511C5C4CE60079BEE8 /* ArticleCommentaryActionCell.xib */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -1252,6 +1271,7 @@
 				9531D7701AF3E8E400E6549D /* Article.swift */,
 				9531D7711AF3E8E400E6549D /* ArticleAgreementAction.swift */,
 				9531D7721AF3E8E400E6549D /* ArticleComment.swift */,
+				A90F99751C5C53130079BEE8 /* ArticleCommentaryAction.swift */,
 				9531D7731AF3E8E400E6549D /* ArticlePublishmentAction.swift */,
 				955E2A051AF75C2100A04791 /* Comment.swift */,
 				954A76A81AFC399D002A72A9 /* DataObject.swift */,
@@ -1286,6 +1306,7 @@
 				9531D7801AF3E8E400E6549D /* String+PlainString.swift */,
 				95D784091B1C5306008EB241 /* Theme.swift */,
 				9531D7811AF3E8E400E6549D /* TintColor.swift */,
+				A9E3F6AC1C5BBBA100FF0BB3 /* AppSecret.swift */,
 			);
 			path = Others;
 			sourceTree = "<group>";
@@ -1739,6 +1760,8 @@
 				95ED5F151B084D3900CDB225 /* SVIndefiniteAnimatedView.h */,
 				95ED5F161B084D3900CDB225 /* SVIndefiniteAnimatedView.m */,
 				95ED5F171B084D3900CDB225 /* SVProgressHUD-Prefix.pch */,
+				A9F63E411C5C561C001F8AC7 /* SVRadialGradientLayer.h */,
+				A9F63E631C5C563E001F8AC7 /* SVRadialGradientLayer.m */,
 				95ED5F181B084D3900CDB225 /* SVProgressHUD.bundle */,
 				95ED5F191B084D3900CDB225 /* SVProgressHUD.h */,
 				95ED5F1A1B084D3900CDB225 /* SVProgressHUD.m */,
@@ -1814,6 +1837,7 @@
 		9588F5DB1A1D9D1C001BC426 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Beijing Information Science and Technology University";
 				TargetAttributes = {
@@ -2106,6 +2130,7 @@
 				9531D7251AF3E4AC00E6549D /* ArticleCell.xib in Resources */,
 				9531D7421AF3E4AC00E6549D /* QuestionFooterCell.xib in Resources */,
 				9531D7501AF3E4AC00E6549D /* TopicCell.xib in Resources */,
+				A90F99531C5C4CE60079BEE8 /* ArticleCommentaryActionCell.xib in Resources */,
 				95EBCF4D1B2DB42E0088FC2C /* TopicSearchResultCell.xib in Resources */,
 				95DB722E1AF5490A0072C77E /* ArticleFooterView.xib in Resources */,
 				9531D7561AF3E4AC00E6549D /* UserCell.xib in Resources */,
@@ -2195,6 +2220,7 @@
 				95C2EA271AB0516800F2A326 /* MSRSegmentWrapper.swift in Sources */,
 				95ED5EF51B084D0500CDB225 /* AFSecurityPolicy.m in Sources */,
 				9531D7931AF3E8E400E6549D /* FeaturedQuestionAnswer.swift in Sources */,
+				A9E3F6AD1C5BBBA100FF0BB3 /* AppSecret.swift in Sources */,
 				958600851B1736FB0054DAA8 /* MSRKeyboardBar.swift in Sources */,
 				95ED5F3C1B084DD600CDB225 /* RMDateSelectionViewController.m in Sources */,
 				9568F39F1AEC748A00B201A8 /* UserEditViewController.swift in Sources */,
@@ -2214,6 +2240,7 @@
 				95EAF7771B3D319700863F19 /* MJRefreshBackNormalFooter.m in Sources */,
 				95ED5F101B084D0E00CDB225 /* UIImageView+AFNetworking.m in Sources */,
 				95DC57191AF8AAFA0075C3CB /* NSObject+MSRClone.swift in Sources */,
+				A90F99781C5C535D0079BEE8 /* HotTopicViewController.swift in Sources */,
 				9531D7471AF3E4AC00E6549D /* QuestionTagListCell.swift in Sources */,
 				95C2EA371AB0516800F2A326 /* MSRSegmentedControlLinearIndicator.swift in Sources */,
 				95EAF7741B3D319700863F19 /* MJRefreshAutoNormalFooter.m in Sources */,
@@ -2224,13 +2251,16 @@
 				959FCB621AEE4EB300299AA6 /* UIColor+MSRGetter.swift in Sources */,
 				9531D73A1AF3E4AC00E6549D /* QuestionPublishmentActionCell.swift in Sources */,
 				9531D78D1AF3E8E400E6549D /* Article.swift in Sources */,
+				A9F63E641C5C563E001F8AC7 /* SVRadialGradientLayer.m in Sources */,
 				9531D7241AF3E4AC00E6549D /* ArticleCell.swift in Sources */,
 				951FAC761ABFCEA30083E221 /* EAColourfulProgressView.m in Sources */,
 				9531D7921AF3E8E400E6549D /* FeaturedObject.swift in Sources */,
 				950FE5101A1DA2B500167D09 /* UserViewController.swift in Sources */,
 				95C2EA401AB0516800F2A326 /* UIColor+MSRRGBA.swift in Sources */,
+				A90F99761C5C53130079BEE8 /* ArticleCommentaryAction.swift in Sources */,
 				955770781AD757B30060A120 /* UIImage+MSRColor.swift in Sources */,
 				95EAF77B1B3D319700863F19 /* MJRefreshStateHeader.m in Sources */,
+				A90F99521C5C4CE60079BEE8 /* ArticleCommentaryActionCell.swift in Sources */,
 				95ED5EF81B084D0500CDB225 /* AFURLResponseSerialization.m in Sources */,
 				95EAF77D1B3D319700863F19 /* MJRefreshConst.m in Sources */,
 				9584217C1B3804B400C36BBA /* CGSize+MSRAccessor.swift in Sources */,
@@ -2304,6 +2334,7 @@
 				951E12F01B202D7C00F076FE /* UITableView+Refresh.swift in Sources */,
 				95C2EA431AB0516800F2A326 /* UINavigationBar+MSRAccessor.swift in Sources */,
 				958600821B17308C0054DAA8 /* UIView+MSRAccessor.swift in Sources */,
+				A90F997A1C5C53890079BEE8 /* HotTopicListViewController.swift in Sources */,
 				9531D7A01AF3E8E400E6549D /* WeChatSessionActivity.swift in Sources */,
 				95C47D4B1AC9C2BE00A56879 /* UIButton+MSRSetter.swift in Sources */,
 				9515766C1B1A055400E5BE8E /* SettingsViewController.swift in Sources */,
@@ -2530,6 +2561,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2549,6 +2581,7 @@
 					"$(PROJECT_DIR)/WeCenterMobile/External/WeChatSDK",
 				);
 				OTHER_LDFLAGS = "-all_load";
+				PRODUCT_BUNDLE_IDENTIFIER = org.iflab.WeCenterMobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2582,6 +2615,7 @@
 					"$(PROJECT_DIR)/WeCenterMobile/External/WeChatSDK",
 				);
 				OTHER_LDFLAGS = "-all_load";
+				PRODUCT_BUNDLE_IDENTIFIER = org.iflab.WeCenterMobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";

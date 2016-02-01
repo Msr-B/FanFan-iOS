@@ -27,7 +27,7 @@ class ArticleFooterView: UIToolbar {
         let v = UIActivityIndicatorView(activityIndicatorStyle: .White)
         let theme = SettingsManager.defaultManager.currentTheme
         v.color = theme.toolbarItemColor
-        v.msr_shouldTranslateAutoresizingMaskIntoConstraints = false
+        v.translatesAutoresizingMaskIntoConstraints = false
         v.hidesWhenStopped = true
         v.stopAnimating()
         return v
@@ -45,13 +45,16 @@ class ArticleFooterView: UIToolbar {
         for v in [separatorAItem, separatorBItem] {
             v.customView!.backgroundColor = theme.borderColorA
         }
+        for item in items ?? [] {
+            item.tintColor = theme.toolbarItemColor
+        }
         let s = NSMutableParagraphStyle.defaultParagraphStyle().mutableCopy() as! NSMutableParagraphStyle
         s.alignment = .Center
         addSubview(activityIndicatorView)
         activityIndicatorView.msr_addCenterConstraintsToSuperview()
     }
     
-    func update(#dataObject: ArticleViewControllerPresentable) {
+    func update(dataObject dataObject: ArticleViewControllerPresentable) {
         if let count = dataObject.agreementCount {
             agreeItem.enabled = true
             disagreeItem.enabled = true

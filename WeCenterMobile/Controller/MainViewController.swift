@@ -46,7 +46,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     lazy var tableView: UITableView = {
         [weak self] in
         let v = UITableView(frame: CGRectZero, style: .Plain)
-        v.msr_shouldTranslateAutoresizingMaskIntoConstraints = false
+        v.translatesAutoresizingMaskIntoConstraints = false
         v.backgroundColor = UIColor.clearColor()
         v.separatorColor = UIColor.clearColor()
         v.delegate = self
@@ -74,7 +74,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     lazy var cells: [SidebarCategoryCell] = {
         [weak self] in
         if let self_ = self {
-            return map(SidebarCategory.allValues) {
+            return SidebarCategory.allValues.map {
                 let cell = NSBundle.mainBundle().loadNibNamed("SidebarCategoryCell", owner: nil, options: nil).first as! SidebarCategoryCell
                 cell.update(category: $0)
                 return cell
@@ -133,7 +133,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         return cell
     }
     func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
-        if tableView.indexPathForSelectedRow() == indexPath {
+        if tableView.indexPathForSelectedRow == indexPath {
             return nil
         }
         let cell = tableView.cellForRowAtIndexPath(indexPath)
@@ -180,6 +180,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 break
             case .Search:
                 contentViewController.setViewControllers([SearchViewController()], animated: true)
+                break
+            case .Topic:
+                contentViewController.setViewControllers([HotTopicViewController()], animated: true)
                 break
             case .Settings:
                 let svc = UIStoryboard(name: "SettingsViewController", bundle: NSBundle.mainBundle()).instantiateInitialViewController() as! SettingsViewController
@@ -240,7 +243,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     func currentThemeDidChange() {
         let theme = SettingsManager.defaultManager.currentTheme
         sidebar.backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: theme.backgroundBlurEffectStyle))
-        let indexPath = tableView.indexPathForSelectedRow()
+        let indexPath = tableView.indexPathForSelectedRow
         tableView.reloadData()
         tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
     }

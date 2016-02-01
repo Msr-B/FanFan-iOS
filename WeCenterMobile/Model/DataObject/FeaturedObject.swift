@@ -25,12 +25,12 @@ class FeaturedObject: DataObject {
 
     @NSManaged var date: NSDate?
     
-    class func fetchFeaturedObjects(#page: Int, count: Int, type: FeaturedObjectListType, success: (([FeaturedObject]) -> Void)?, failure: ((NSError) -> Void)?) {
+    class func fetchFeaturedObjects(page page: Int, count: Int, type: FeaturedObjectListType, success: (([FeaturedObject]) -> Void)?, failure: ((NSError) -> Void)?) {
         NetworkManager.defaultManager!.GET("Explore List",
             parameters: [
                 "page": page,
                 "per_page": count,
-                // "day": 30,
+                "day": 30,
                 "is_recommend": type == .Recommended ? 1 : 0,
                 "sort_type": type.rawValue],
             success: {
@@ -38,7 +38,7 @@ class FeaturedObject: DataObject {
                 let dataManager = DataManager.temporaryManager! // @TODO: Will move to DataManager.defaultManager in future.
                 var featuredObjects = [FeaturedObject]()
                 if Int(msr_object: data["total_rows"]!!) <= 0 {
-                    failure?(NSError()) // Needs specification
+                    failure?(NSError(domain: NetworkManager.defaultManager!.website, code: NetworkManager.defaultManager!.internalErrorCode.integerValue, userInfo: nil)) // Needs specification
                     return
                 }
                 for object in data["rows"] as! [NSDictionary] {
@@ -53,13 +53,13 @@ class FeaturedObject: DataObject {
                             featuredQuestionAnswer.date = NSDate(timeIntervalSince1970: NSTimeInterval(msr_object: object["add_time"])!)
                             question.date = featuredQuestionAnswer.date
                             question.title = (object["question_content"] as! String)
-                            question.updatedDate = NSDate(timeIntervalSince1970: NSTimeInterval(msr_object: object["update_time"])!)
+//                            question.updatedDate = NSDate(timeIntervalSince1970: NSTimeInterval(msr_object: object["update_time"])!)
                             question.viewCount = Int(msr_object: object["view_count"])
-                            question.focusCount = Int(msr_object: object["focus_count"])
+//                            question.focusCount = Int(msr_object: object["focus_count"])
                             if let userInfo = object["user_info"] as? NSDictionary {
                                 question.user = (dataManager.autoGenerate("User", ID: Int(msr_object: userInfo["uid"])!) as! User)
                                 question.user!.name = (userInfo["user_name"] as! String)
-                                question.user!.avatarURI = userInfo["avatar_file"] as? String
+                                question.user!.avatarURL = userInfo["avatar_file"] as? String
                             } else {
                                 question.user = nil
                             }
@@ -68,6 +68,7 @@ class FeaturedObject: DataObject {
                                 for topicInfo in topicsInfo {
                                     let topic = dataManager.autoGenerate("Topic", ID: Int(msr_object: topicInfo["topic_id"]!)!) as! Topic
                                     topic.title = (topicInfo["topic_title"] as! String)
+                                    topics.insert(topic)
                                 }
                             }
                             question.topics = topics
@@ -75,9 +76,7 @@ class FeaturedObject: DataObject {
                             for (userID, userInfo) in object["answer_users"] as? [String: NSDictionary] ?? [:] {
                                 let user = dataManager.autoGenerate("User", ID: Int(msr_object: userID)!) as! User
                                 user.name = userInfo["user_name"] as? String ?? ""
-                                var avatarURI = userInfo["avatar_file"] as? String
-                                avatarURI = avatarURI == "" ? nil : avatarURI
-                                user.avatarURI = avatarURI
+                                user.avatarURL = userInfo["avatar_file"] as? String
                                 featuredUsers.insert(user)
                             }
                             featuredQuestionAnswer.answerUsers = featuredUsers
@@ -97,9 +96,7 @@ class FeaturedObject: DataObject {
                                     if let userInfo = answerInfo["user_info"] as? NSDictionary {
                                         answer.user = (dataManager.autoGenerate("User", ID: Int(msr_object: userInfo["uid"])!) as! User)
                                         answer.user!.name = (userInfo["user_name"] as! String)
-                                        var avatarURI = userInfo["avatar_file"] as? String // Might be NSNull or "" here.
-                                        avatarURI = avatarURI == "" ? nil : avatarURI
-                                        answer.user!.avatarURI = avatarURI
+                                        answer.user!.avatarURI = userInfo["avatar_file"] as? String // Might be NSNull or "" here.
                                         featuredAnswers.insert(answer)
                                     } else {
                                         answer.user = nil
@@ -130,9 +127,7 @@ class FeaturedObject: DataObject {
                             if let userInfo = object["user_info"] as? NSDictionary {
                                 let user = dataManager.autoGenerate("User", ID: Int(msr_object: userInfo["uid"])!) as! User
                                 user.name = (userInfo["user_name"] as! String)
-                                var avatarURI = userInfo["avatar_file"] as? String
-                                avatarURI = avatarURI == "" ? nil : avatarURI
-                                user.avatarURI = avatarURI
+                                user.avatarURL = userInfo["avatar_file"] as? String
                                 article.user = user
                             } else {
                                 article.user = nil
@@ -141,10 +136,11 @@ class FeaturedObject: DataObject {
                         }
                         featuredObjects.append(featuredObject)
                     } else {
-                        failure?(NSError()) // Needs specification
+                        failure?(NSError(domain: NetworkManager.defaultManager!.website, code: NetworkManager.defaultManager!.internalErrorCode.integerValue, userInfo: nil)) // Needs specification
                         return
                     }
                 }
+                _ = try? DataManager.defaultManager.saveChanges()
                 success?(featuredObjects)
             },
             failure: failure)

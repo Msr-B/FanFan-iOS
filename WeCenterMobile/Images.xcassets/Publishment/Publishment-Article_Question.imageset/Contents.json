@@ -2,13 +2,13 @@
   "images" : [
     {
       "idiom" : "universal",
-      "scale" : "1x",
-      "filename" : "Publishment-Article_Question.png"
+      "filename" : "release-1.png",
+      "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "scale" : "2x",
-      "filename" : "Publishment-Article_Question@2x.png"
+      "filename" : "release.png",
+      "scale" : "2x"
     },
     {
       "idiom" : "universal",
@@ -17,7 +17,9 @@
   ],
   "info" : {
     "version" : 1,
-    "author" : "xcode",
+    "author" : "xcode"
+  },
+  "properties" : {
     "template-rendering-intent" : "template"
   }
 }

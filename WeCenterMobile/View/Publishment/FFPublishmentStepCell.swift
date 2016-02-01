@@ -28,7 +28,7 @@ class FFPublishmentStepCell: UITableViewCell, UITextViewDelegate {
         textView.attributedPlaceholder = NSAttributedString(string: textView.placeholder ?? "",
             attributes: [
                 NSForegroundColorAttributeName: theme.footnoteTextColor,
-                NSFontAttributeName: textView.font])
+                NSFontAttributeName: textView.font!])
         separator.backgroundColor = theme.borderColorA
         titleImageButton.tintColor = theme.backgroundColorA
         titleImageButton.msr_borderColor = theme.borderColorA
@@ -36,7 +36,7 @@ class FFPublishmentStepCell: UITableViewCell, UITextViewDelegate {
         msr_scrollView?.msr_setTouchesShouldCancel(true, inContentViewWhichIsKindOfClass: UIButton.self)
     }
     
-    func update(#step: FFStepObject) {
+    func update(step step: FFStepObject) {
         let theme = SettingsManager.defaultManager.currentTheme
         textView.text = step.text
         if let image = step.image {
@@ -53,9 +53,8 @@ class FFPublishmentStepCell: UITableViewCell, UITextViewDelegate {
         layoutIfNeeded()
     }
     
-    func updateProgress(#step: FFStepObject) {
-        let theme = SettingsManager.defaultManager.currentTheme
-        if let image = step.image {
+    func updateProgress(step step: FFStepObject) {
+        if let _ = step.image {
             if step.uploadingProgresses < FFStepObject.maxProgress {
                 progressView.hidden = false
                 titleImageButton.msr_setBackgroundImageWithColor(UIColor.blackColor().colorWithAlphaComponent(0.5))

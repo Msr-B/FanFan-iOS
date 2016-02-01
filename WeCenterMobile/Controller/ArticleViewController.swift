@@ -15,15 +15,16 @@ import UIKit
     /* @TODO: optional */ var date: NSDate? { get }
     /* @TODO: optional */ var body: String? { get }
     var user: User? { get }
+    var id: NSNumber { get }
     var title: String? { get }
     var agreementCount: NSNumber? { get set }
     var evaluationRawValue: NSNumber? { get }
-    func fetchDataObjectForArticleViewController(#success: ((ArticleViewControllerPresentable) -> Void)?, failure: ((NSError) -> Void)?)
-    func evaluate(#value: Evaluation, success: (() -> Void)?, failure: ((NSError) -> Void)?)
+    func fetchDataObjectForArticleViewController(success success: ((ArticleViewControllerPresentable) -> Void)?, failure: ((NSError) -> Void)?)
+    func evaluate(value value: Evaluation, success: (() -> Void)?, failure: ((NSError) -> Void)?)
 }
 
 extension Answer: ArticleViewControllerPresentable {
-    func fetchDataObjectForArticleViewController(#success: ((ArticleViewControllerPresentable) -> Void)?, failure: ((NSError) -> Void)?) {
+    func fetchDataObjectForArticleViewController(success success: ((ArticleViewControllerPresentable) -> Void)?, failure: ((NSError) -> Void)?) {
         Answer.fetch(ID: id, success: { success?($0) }, failure: failure)
     }
     var evaluationRawValue: NSNumber? {
@@ -32,7 +33,7 @@ extension Answer: ArticleViewControllerPresentable {
 }
 
 extension Article: ArticleViewControllerPresentable {
-    func fetchDataObjectForArticleViewController(#success: ((ArticleViewControllerPresentable) -> Void)?, failure: ((NSError) -> Void)?) {
+    func fetchDataObjectForArticleViewController(success success: ((ArticleViewControllerPresentable) -> Void)?, failure: ((NSError) -> Void)?) {
         Article.fetch(ID: id, success: { success?($0) }, failure: failure)
     }
     var evaluationRawValue: NSNumber? {
@@ -46,21 +47,21 @@ class ArticleViewController: UIViewController, UIScrollViewDelegate, ArticleHead
         [weak self] in
         let v = ArticleHeaderView()
         v.delegate = self
-        v.autoresizingMask = .FlexibleWidth | .FlexibleBottomMargin
+        v.autoresizingMask = [.FlexibleWidth, .FlexibleBottomMargin]
         return v
     }()
     
     lazy var footer: ArticleFooterView = {
         [weak self] in
         let v = NSBundle.mainBundle().loadNibNamed("ArticleFooterView", owner: nil, options: nil).first as! ArticleFooterView
-        v.autoresizingMask = .FlexibleWidth | .FlexibleTopMargin
+        v.autoresizingMask = [.FlexibleWidth, .FlexibleTopMargin]
         return v
     }()
     
     lazy var bodyView: DTAttributedTextView = {
         [weak self] in
         let v = DTAttributedTextView()
-        v.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+        v.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         v.alwaysBounceVertical = true
         v.delaysContentTouches = false
         v.msr_setTouchesShouldCancel(true, inContentViewWhichIsKindOfClass: UIButton.self)
@@ -83,7 +84,7 @@ class ArticleViewController: UIViewController, UIScrollViewDelegate, ArticleHead
         super.init(nibName: nil, bundle: nil)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -292,7 +293,7 @@ class ArticleViewController: UIViewController, UIScrollViewDelegate, ArticleHead
         let title = dataObject.title!
         let image = dataObject.user?.avatar ?? defaultUserAvatar
         let body = dataObject.body!.wc_plainString
-        let url = NetworkManager.defaultManager!.website
+        let url: String = (dataObject is Answer) ? "\(NetworkManager.defaultManager!.website)?/question/\((dataObject as! Answer).question!.id)" : "\(NetworkManager.defaultManager!.website)?/article/\(dataObject.id)"
         var items = [title, body, NSURL(string: url)!]
         if image != nil {
             items.append(image!)
@@ -317,7 +318,7 @@ class ArticleViewController: UIViewController, UIScrollViewDelegate, ArticleHead
         }
     }
     
-    func evaluate(#value: Evaluation) {
+    func evaluate(value value: Evaluation) {
         let count = dataObject.agreementCount?.integerValue
         dataObject.agreementCount = nil
         footer.update(dataObject: dataObject)
@@ -332,7 +333,7 @@ class ArticleViewController: UIViewController, UIScrollViewDelegate, ArticleHead
             failure: {
                 [weak self] error in
                 self?.footer.update(dataObject: self!.dataObject)
-                let message = error.userInfo?[NSLocalizedDescriptionKey] as? String ?? "未知错误"
+                let message = error.userInfo[NSLocalizedDescriptionKey] as? String ?? "未知错误"
                 let ac = UIAlertController(title: "错误", message: message, preferredStyle: .Alert)
                 ac.addAction(UIAlertAction(title: "好", style: .Default, handler: nil))
                 self?.showDetailViewController(ac, sender: self)

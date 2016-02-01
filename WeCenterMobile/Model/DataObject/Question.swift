@@ -28,11 +28,12 @@ class Question: DataObject {
     
     var focusing: Bool? = nil
     
-    class func fetch(#ID: NSNumber, success: ((Question) -> Void)?, failure: ((NSError) -> Void)?) {
+    class func fetch(ID ID: NSNumber, success: ((Question) -> Void)?, failure: ((NSError) -> Void)?) {
         let question = Question.cachedObjectWithID(ID)
         NetworkManager.defaultManager!.GET("Question Detail",
             parameters: [
-                "id": ID
+                "id": ID,
+                "sort": "DESC"/// @TODO 倒叙
             ],
             success: {
                 data in
@@ -41,10 +42,11 @@ class Question: DataObject {
                 question.title = value["question_content"] as? String
                 question.body = value["question_detail"] as? String
                 question.focusCount = Int(msr_object: value["focus_count"])
-                question.focusing = (Int(msr_object: value["has_focus"]) == 1)
-                for (key, value) in data["answers"] as? [String: NSDictionary] ?? [:] {
+                question.focusing = (Int(msr_object: value["user_question_focus"]) == 1)
+                
+                for value in (data["answers"] as! [NSDictionary] ) {
                     let answerID = value["answer_id"] as! NSNumber
-                    var answer: Answer! = filter(question.answers) { $0.id == answerID }.first
+                    var answer: Answer! = question.answers.filter { $0.id == answerID }.first
                     if answer == nil {
                         answer = Answer.cachedObjectWithID(answerID)
                         question.answers.insert(answer)
@@ -55,8 +57,9 @@ class Question: DataObject {
                     if answer.user == nil {
                         answer.user = User.cachedObjectWithID(Int(msr_object: value["uid"])!)
                     }
-                    answer.user!.name = value["user_name"] as? String
-                    answer.user!.avatarURI = value["avatar_file"] as? String
+                    let userInfo = value["user_info"] as! NSDictionary
+                    answer.user!.name = userInfo["user_name"] as? String
+                    answer.user!.avatarURL = userInfo["avatar_file"] as? String
                 }
                 for value in data["question_topics"] as! [NSDictionary] {
                     let topicID = value["topic_id"] as! NSNumber
@@ -64,13 +67,14 @@ class Question: DataObject {
                     topic.title = value["topic_title"] as? String
                     question.topics.insert(topic)
                 }
+                _ = try? DataManager.defaultManager.saveChanges()
                 success?(question)
             },
             failure: failure)
     }
     
-    func toggleFocus(#success: (() -> Void)?, failure: ((NSError) -> Void)?) {
-        NetworkManager.defaultManager!.GET("Focus Question",
+    func toggleFocus(success success: (() -> Void)?, failure: ((NSError) -> Void)?) {
+        NetworkManager.defaultManager!.POST("Focus Question",
             parameters: [
                 "question_id": id
             ],
@@ -81,8 +85,11 @@ class Question: DataObject {
                     if self_.focusCount != nil {
                         self_.focusCount = self_.focusCount!.integerValue + (self!.focusing! ? 1 : -1)
                     }
+                    _ = try? DataManager.defaultManager.saveChanges()
+                    success?()
+                } else {
+                    failure?(NSError(domain: NetworkManager.defaultManager!.website, code: NetworkManager.defaultManager!.internalErrorCode.integerValue, userInfo: nil)) // Needs specification
                 }
-                success?()
             },
             failure: failure)
     }
@@ -92,7 +99,7 @@ class Question: DataObject {
             GETParameters: [
                 "id": "question",
                 "attach_access_key": attachmentKey!],
-            POSTParameters: nil,
+            POSTParameters: [:],
             constructingBodyWithBlock: {
                 data in
                 data?.appendPartWithFileData(jpegData, name: "qqfile", fileName: "image.jpg", mimeType: "image/jpeg")
@@ -106,13 +113,13 @@ class Question: DataObject {
             failure: failure)!
     }
     
-    func post(#success: (() -> Void)?, failure: ((NSError) -> Void)?) {
+    func post(success success: (() -> Void)?, failure: ((NSError) -> Void)?) {
         let topics = [Topic](self.topics)
         var topicsParameter = ""
         if topics.count == 1 {
             topicsParameter = topics[0].title!
         } else if topics.count > 1 {
-            topicsParameter = join(",", map(topics, { $0.title! }))
+            topicsParameter = topics.map({ $0.title! }).joinWithSeparator(",")
         }
         let title = self.title!
         let body = self.body!
@@ -124,7 +131,7 @@ class Question: DataObject {
                 "topics": topicsParameter
             ],
             success: {
-                [weak self] data in
+                _ in
                 success?()
                 return
             },

@@ -22,54 +22,55 @@ class NetworkManager: NSObject {
     }
     static var defaultManager = NetworkManager(configuration: NSDictionary(contentsOfFile: NSBundle.mainBundle().pathForResource("Configuration", ofType: "plist")!)!)
     func GET(key: String,
-        parameters: NSDictionary?,
+        parameters: [String: AnyObject],
         success: ((AnyObject) -> Void)?,
         failure: ((NSError) -> Void)?) -> AFHTTPRequestOperation? {
             return request(key,
                 GETParameters: parameters,
-                POSTParameters: nil,
+                POSTParameters: [:],
                 constructingBodyWithBlock: nil,
                 success: success,
                 failure: failure)
     }
     func POST(key: String,
-        parameters: NSDictionary?,
+        parameters: [String: AnyObject],
         success: ((AnyObject) -> Void)?,
         failure: ((NSError) -> Void)?) -> AFHTTPRequestOperation? {
             return request(key,
-                GETParameters: nil,
+                GETParameters: [:],
                 POSTParameters: parameters,
                 constructingBodyWithBlock: nil,
                 success: success,
                 failure: failure)
     }
     func request(key: String,
-        GETParameters: NSDictionary?,
-        POSTParameters: NSDictionary?,
+        var GETParameters: [String: AnyObject],
+        POSTParameters: [String: AnyObject],
         constructingBodyWithBlock block: ((AFMultipartFormData?) -> Void)?,
         success: ((AnyObject) -> Void)?,
         failure: ((NSError) -> Void)?) -> AFHTTPRequestOperation? {
-            var error: NSError? = nil
-            let URLString = manager.requestSerializer.requestWithMethod("GET", URLString: paths[key]!, parameters: GETParameters, error: &error).URL?.absoluteString
-            if error != nil || URLString == nil {
-                failure?(error ?? NSError()) // Needs specification
+            do {
+                GETParameters["mobile_sign"] = getMobileSignWithPath(paths[key]!)
+                let URLString = try manager.requestSerializer.requestWithMethod("GET", URLString: paths[key]!, parameters: GETParameters, error: ()).URL!.absoluteString
+                return manager.POST(URLString,
+                    parameters: POSTParameters,
+                    constructingBodyWithBlock: block,
+                    success: {
+                        [weak self] operation, data in
+                        self?.handleSuccess(operation: operation, data: data as! NSData, success: success, failure: failure)
+                    },
+                    failure: {
+                        operation, error in
+                        failure?(error)
+                    })
+            } catch let error as NSError {
+                failure?(error)
                 return nil
             }
-            return manager.POST(URLString!,
-                parameters: POSTParameters,
-                constructingBodyWithBlock: block,
-                success: {
-                    [weak self] operation, data in
-                    self?.handleSuccess(operation: operation, data: data as! NSData, success: success, failure: failure)
-                },
-                failure: {
-                    operation, error in
-                    failure?(error)
-                })
     }
     class func clearCookies() {
         let storage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
-        for cookie in storage.cookies as! [NSHTTPCookie] {
+        for cookie in storage.cookies! {
             storage.deleteCookie(cookie)
         }
         NSUserDefaults.standardUserDefaults().removeObjectForKey(UserDefaultsCookiesKey)
@@ -77,18 +78,17 @@ class NetworkManager: NSObject {
         NSUserDefaults.standardUserDefaults().synchronize()
         NSURLCache.sharedURLCache().removeAllCachedResponses()
     }
-    private func handleSuccess(#operation: AFHTTPRequestOperation, data: NSData, success: ((AnyObject) -> Void)?, failure: ((NSError) -> Void)?) {
-        var error: NSError? = nil
-        let object: AnyObject! = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error)
-        if error != nil || object == nil || !(object is NSDictionary) {
+    private func handleSuccess(operation operation: AFHTTPRequestOperation, data: NSData, success: ((AnyObject) -> Void)?, failure: ((NSError) -> Void)?) {
+        let object: AnyObject
+        do {
+            object = try NSJSONSerialization.JSONObjectWithData(data, options: [])
+        } catch let error as NSError {
             var userInfo = [
                 NSLocalizedDescriptionKey: "Failed to parse JSON.",
                 NSLocalizedFailureReasonErrorKey: "The data returned from the server does not meet the JSON syntax.",
                 NSURLErrorKey: operation.response.URL!
             ]
-            if operation.error != nil {
-                userInfo[NSUnderlyingErrorKey] = operation.error
-            }
+            userInfo[NSUnderlyingErrorKey] = error
             let error = NSError(
                 domain: website,
                 code: self.internalErrorCode.integerValue,
@@ -102,7 +102,7 @@ class NetworkManager: NSObject {
             let info: AnyObject = data["rsm"]!
 //            NSLog("\(operation.response.URL!)\n\(info)")
             success?(info)
-            DataManager.defaultManager!.saveChanges(nil) // It's not a good idea to be placed here, but this could reduce duplicate codes.
+            _ = try? DataManager.defaultManager!.saveChanges() // It's not a good idea to be placed here, but this could reduce duplicate codes.
         } else {
             var userInfo = [
                 NSLocalizedDescriptionKey: data["err"]!,
@@ -125,6 +125,9 @@ class NetworkManager: NSObject {
     }
     var paths: [String: String] {
         return configuration["Path"] as! [String: String]
+    }
+    var appSecret: String? {
+        return configuration["App Secret"] as? String
     }
     private lazy var manager: AFHTTPRequestOperationManager = {
         [weak self] in
