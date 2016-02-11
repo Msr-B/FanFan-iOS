@@ -75,7 +75,7 @@ extension UITableView {
         header.stateLabel!.textColor = theme.footnoteTextColor
         header.stateLabel!.font = UIFont.boldSystemFontOfSize(12)
         var images = [UIImage]()
-        let originImage = UIImage(named: "refresh")
+        let originImage = UIImage(named: "Refresh")
         for i in 0..<60 {
             let rotate = CGFloat(M_PI * Double(i) / 30.0)
             images.append(squareImageRotation(originImage!, rotate: rotate))

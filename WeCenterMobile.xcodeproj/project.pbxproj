@@ -23,7 +23,7 @@
 		950FE7E81A1DA53A00167D09 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 950FE7D31A1DA4F900167D09 /* libxml2.dylib */; };
 		9515766C1B1A055400E5BE8E /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9515766B1B1A055400E5BE8E /* SettingsViewController.swift */; };
 		9515766E1B1B4A5300E5BE8E /* SettingsViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9515766D1B1B4A5300E5BE8E /* SettingsViewController.storyboard */; };
-		951D2F8F1AB7F8C000DCB678 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 951D2F8E1AB7F8C000DCB678 /* Images.xcassets */; };
+		951D2F8F1AB7F8C000DCB678 /* fanfanImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 951D2F8E1AB7F8C000DCB678 /* fanfanImages.xcassets */; };
 		951DA7551AEAACD300F0E3A7 /* UIImage+MSRGetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951DA7541AEAACD300F0E3A7 /* UIImage+MSRGetter.swift */; };
 		951DA7571AEAAE6300F0E3A7 /* MSRRoundedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951DA7561AEAAE6300F0E3A7 /* MSRRoundedImageView.swift */; };
 		951E12F01B202D7C00F076FE /* UITableView+Refresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951E12EF1B202D7C00F076FE /* UITableView+Refresh.swift */; };
@@ -592,7 +592,7 @@
 		950FE7DF1A1DA52000167D09 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		9515766B1B1A055400E5BE8E /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SettingsViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		9515766D1B1B4A5300E5BE8E /* SettingsViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = SettingsViewController.storyboard; sourceTree = "<group>"; };
-		951D2F8E1AB7F8C000DCB678 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		951D2F8E1AB7F8C000DCB678 /* fanfanImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = fanfanImages.xcassets; sourceTree = "<group>"; };
 		951DA7541AEAACD300F0E3A7 /* UIImage+MSRGetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+MSRGetter.swift"; sourceTree = "<group>"; };
 		951DA7561AEAAE6300F0E3A7 /* MSRRoundedImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSRRoundedImageView.swift; sourceTree = "<group>"; };
 		951E12EF1B202D7C00F076FE /* UITableView+Refresh.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableView+Refresh.swift"; sourceTree = "<group>"; };
@@ -1360,7 +1360,7 @@
 				950FE1291A1DA2B300167D09 /* Controller */,
 				950FE13B1A1DA2B300167D09 /* External */,
 				9588F5F41A1D9D1C001BC426 /* LaunchScreen.xib */,
-				951D2F8E1AB7F8C000DCB678 /* Images.xcassets */,
+				951D2F8E1AB7F8C000DCB678 /* fanfanImages.xcassets */,
 				956E70ED1AAFC4E100A3FD7D /* WeCenterMobile.xcdatamodeld */,
 				9588F5E61A1D9D1C001BC426 /* Supporting Files */,
 			);
@@ -2143,7 +2143,7 @@
 				9531D7581AF3E4AC00E6549D /* UserFooterCell.xib in Resources */,
 				95EBCF4F1B2DB4430088FC2C /* UserSearchResultCell.xib in Resources */,
 				95EAF7231B3D25B900863F19 /* WeiboSDK.bundle in Resources */,
-				951D2F8F1AB7F8C000DCB678 /* Images.xcassets in Resources */,
+				951D2F8F1AB7F8C000DCB678 /* fanfanImages.xcassets in Resources */,
 				9531D72E1AF3E4AC00E6549D /* FeaturedQuestionAnswerCellB.xib in Resources */,
 				95ED5F1C1B084D3900CDB225 /* SVProgressHUD.bundle in Resources */,
 				9531D7371AF3E4AC00E6549D /* ArticlePublishmentActionCell.xib in Resources */,
@@ -2558,6 +2558,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -2593,6 +2594,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

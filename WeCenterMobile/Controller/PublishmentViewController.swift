@@ -374,7 +374,7 @@ class PublishmentViewController: UIViewController, ZFTokenFieldDataSource, ZFTok
                         return UIImageJPEGRepresentation($0, SelfType.imageCompressionQuality)
                     }
                     dispatch_async(dispatch_get_main_queue()) {
-//                        [weak self] in
+                        [weak self] in
                         step.image = images.first!
                         step.uploadingProgresses = uploadingProgress.first!
                         step.attachID = attachIDs.first!
